@@ -8,12 +8,9 @@ import numpy as np
 class ConvPoolLayer(object):
     """Pool Layer of a convolutional network """
 
-    def __init__(self, rng, input, filter_shape, image_shape, poolsize=(2, 2)):
+    def __init__(self, input, filter_shape, image_shape, poolsize=(2, 2)):
         """
         Allocate a NetConvPoolLayer with shared variable internal parameters.
-
-        :type rng: numpy.random.RandomState
-        :param rng: a random number generator used to initialize weights
 
         :type input: theano.tensor.dtensor4
         :param input: symbolic image tensor, of shape image_shape
@@ -42,13 +39,10 @@ class ConvPoolLayer(object):
                    np.prod(poolsize))
         # initialize weights with random weights
         W_bound = np.sqrt(6. / (fan_in + fan_out))
+
         self.W = theano.shared(
-            np.asarray(
-                rng.uniform(low=-W_bound, high=W_bound, size=filter_shape),
-                dtype=theano.config.floatX
-            ),
-            borrow=True
-        )
+            np.random.uniform(low=-W_bound, high=W_bound, size=filter_shape),
+            dtype=theano.config.floatX, name = 'W')
 
         # the bias is a 1D tensor -- one bias per output feature map
         b_values = np.zeros((filter_shape[0],), dtype=theano.config.floatX)

@@ -46,6 +46,8 @@ class RNNLayer:
             np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.output_dim)),
             dtype=theano.config.floatX, name = 'BO')
 
+        # store parameters of this layer
+        self.params = [self.U, self.V, self.W, self.B,self.BO]
         [o, st], updates = theano.scan(forward_recurrent_step,
                                       sequence=input,
                                       outputs_info=[None, dict(initial=np.zeros(self.hidden_dim)), None, None],
