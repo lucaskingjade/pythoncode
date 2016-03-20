@@ -57,3 +57,13 @@ class RNNLayer:
 
     def binary_crossentropy(self, y):
         return T.sum(T.nnet.binary_crossentropy(self.output, y))
+
+
+def test():
+    a = np.arange(0,10,0.1)
+    b = np.arange(5,20,0.1)
+    bias = [np.random.sample()/ 100.0 for i in range(100)]
+    bias2 = [np.random.sample()/ 100.0 for i in range(100)]
+    bias3 = [np.random.sample()/ 100.0 for i in range(100)]
+    x = np.array([  [   [a[i] * 0.1 + np.random.sample()/ 100.0, (b[i]) * 0.1 - np.random.sample()/ 100.0] for i in range(100)  ]   for j in range(2) ])
+    y = np.array([  [ [x[0][i][0] //0.5 ] for i in range(100)  ] for j in range(2) ])
