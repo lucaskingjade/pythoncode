@@ -51,13 +51,34 @@ class RNNLayer:
 
     def binary_crossentropy(self, output, y):
         return T.sum(T.nnet.binary_crossentropy(output, y))
+    
+    def save_model_parameters_theano(self, outfile):
+        U, V, W, B, BO = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value()
+        np.savez(outfile, U=U, V=V, W=W, B=B, BO=BO)
+    #print ("Saved model parameters to %s." % outfile)
+   
+    def load_model_parameters_theano(self, path):
+        npzfile = np.load(path)
+        U, V, W, B, BO = npzfile["U"], npzfile["V"], npzfile["W"], npzfile["B"], npzfile["BO"]
+        self.hidden_dim = U.shape[0]
+        self.U.set_value(U)
+        self.V.set_value(V)
+        self.W.set_value(W)
+        self.B.set_value(B)
+        self.BO.set_value(BO)
 
 
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
 NEPOCH = int(os.environ.get("NEPOCH", "100"))
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
-PRINT_EVERY = int(os.environ.get("PRINT_EVERY", "5"))
+PRINT_EVERY = int(os.environ.get("PRINT_EVERY", "10"))
 VALID_EVERY = int(os.environ.get("VALID_EVERY", "5"))
+SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "10"))
+
+MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
+if not MODEL_OUTPUT_FILE:
+    ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
+    MODEL_OUTPUT_FILE = "RNN-%s.dat" % (ts)
 
 class RNN:
     def __init__(self, inputdim, hiddendim, outputdim):
@@ -67,11 +88,11 @@ class RNN:
 
         self.learning_rate = T.scalar('learning_rate')
 
-        layer = RNNLayer(x, inputdim, hiddendim, outputdim)
+        self.layer = RNNLayer(x, inputdim, hiddendim, outputdim)
 
-        o_error = layer.binary_crossentropy(layer.output, y)
+        o_error = self.layer.binary_crossentropy(self.layer.output, y)
 
-        grads = T.grad(o_error, layer.params)
+        grads = T.grad(o_error, self.layer.params)
 
         # train_model is a function that updates the model parameters by
         # SGD Since this model has many parameters, it would be tedious to
@@ -81,10 +102,10 @@ class RNN:
 
         updates = [
             (param_i, param_i - self.learning_rate * grad_i)
-            for param_i, grad_i in zip(layer.params, grads)
+            for param_i, grad_i in zip(self.layer.params, grads)
         ]
 
-        self.forward_propagation = theano.function([x], [layer.output])
+        self.forward_propagation = theano.function([x], [self.layer.output])
         self.bptt = theano.function([x, y], grads)
         self.ce_error = theano.function([x, y], o_error)
 
@@ -102,6 +123,9 @@ class RNN:
     def predict(self, x):
         y = self.forward_propagation(x)[0]
         return y // 0.5
+    
+    def loadFile(self, path):
+        self.layer.load_model_parameters_theano(path)
 
 def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH, evaluate_loss_after=PRINT_EVERY):
     # We keep track of the losses so we can plot them later
@@ -134,7 +158,10 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
         if(epoch % VALID_EVERY == 0):
             if(trainDatalen < len(Y_train)):
                 validatTest(model, X_train[0], Y_train[0], 0)
-                validatTest(model, X_train[trainDatalen], Y_train[trainDatalen], 1)
+                validatTest(model, X_train[trainDatalen + 1], Y_train[trainDatalen + 1], 1)
+                
+        if(epoch % SAVE_EVERY == 0):
+            model.layer.save_model_parameters_theano(MODEL_OUTPUT_FILE)
 
 def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
     orgnizeddatainput = []
@@ -208,9 +235,9 @@ def test():
     y = np.array([  [ [x[0][i][0] //0.5 ] for i in range(100)  ] for j in range(5) ])
 
 
-    orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 5, 2)
+    orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
 
-    model = RNN(10, 10, 1)
+    model = RNN(4, 10, 1)
 
     train_with_sgd(model, orgnizeddatainput, orgnizeddataoutput)
     #orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
