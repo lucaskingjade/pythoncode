@@ -207,9 +207,12 @@ def test():
     x = np.array([  [   [a[i] * 0.1 + np.random.sample()/ 100.0, (b[i]) * 0.1 - np.random.sample()/ 100.0,] for i in range(100)]   for j in range(5) ])
     y = np.array([  [ [x[0][i][0] //0.5 ] for i in range(100)  ] for j in range(5) ])
 
-    model = RNN(2, 5, 1)
 
-    train_with_sgd(model, x, y)
+    orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 5, 2)
+
+    model = RNN(10, 10, 1)
+
+    train_with_sgd(model, orgnizeddatainput, orgnizeddataoutput)
     #orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
 
 
