@@ -190,8 +190,8 @@ def accuracy(predicted, actual):
 
 def validatTest(model, x_valid, y_valid):
      for i in range(len(y_valid)):
-         re = model.predict(x_valid[0])
-         precision, recall, f = evaluationF(re, y_valid[0])
+         re = model.predict(x_valid)
+         precision, recall, f = evaluationF(re, y_valid)
          print("validation test (%s): precision(%s),  recall(%s), f(%s)", (i, precision, recall, f))
 
 def test():
