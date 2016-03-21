@@ -173,7 +173,7 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
             
         timeloop = datetime.now()
         
-        print("%s epoch: %s second" %  (timeloop - timestart).total_seconds())
+        print("%s epoch: %s second" %  (epoch, (timeloop - timestart).total_seconds()))
             
     timeend = datetime.now()
     print("total train: %s second" %  (timeend - timebegin).total_seconds())
