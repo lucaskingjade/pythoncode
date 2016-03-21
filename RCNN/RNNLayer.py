@@ -82,6 +82,7 @@ if not MODEL_OUTPUT_FILE:
 
 class RNN:
     def __init__(self, inputdim, hiddendim, outputdim):
+        timestart = datetime.now()
         x = T.matrix('x')   # the data is presented as rasterized images
         y = T.matrix('y')  # the labels are presented as 1D vector of
                         # [int] labels
@@ -111,6 +112,10 @@ class RNN:
 
         self.sgd_step = theano.function([x,y, self.learning_rate], [o_error],
                       updates=updates)
+        
+        timeend = datetime.now()
+        
+        print("model building: %s second",  (timeend - timestart).total_seconds())
 
     def calculate_total_loss(self, X, Y):
         return np.sum([self.ce_error(x,y) for x,y in zip(X,Y)])
@@ -129,10 +134,12 @@ class RNN:
 
 def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH, evaluate_loss_after=PRINT_EVERY):
     # We keep track of the losses so we can plot them later
+    timebegin = datetime.now()
     losses = []
     num_examples_seen = 0
     trainDatalen = int(len(Y_train) * 0.6)
     for epoch in range(nepoch):
+        timestart = datetime.now()
         # Optionally evaluate the loss
         if (epoch % evaluate_loss_after == 0):
             loss = model.calculate_loss(X_train, Y_train)
@@ -151,8 +158,9 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
             #print(yo[1])
             #bptt_gradients = model.bptt(X_train[i], y_train[i])
             o_error = model.sgd_step(X_train[i], Y_train[i], learning_rate)
-            print("output error")
-            print(o_error)
+            if(i % 20 == 0):
+                print("output error")
+                print(o_error)
             num_examples_seen += 1
 
         if(epoch % VALID_EVERY == 0):
@@ -162,6 +170,13 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
                 
         if(epoch % SAVE_EVERY == 0):
             model.layer.save_model_parameters_theano(MODEL_OUTPUT_FILE)
+            
+        timeloop = datetime.now()
+        
+        print("%s epoch: %s second",  (timeloop - timestart).total_seconds())
+            
+    timeend = datetime.now()
+    print("total train: %s second",  (timeend - timebegin).total_seconds())
 
 def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
     orgnizeddatainput = []
@@ -226,6 +241,8 @@ def validatTest(model, x_valid, y_valid, sig):
         print("validation test : precision(%s),  recall(%s), f(%s)", (precision, recall, f))
 
 def test():
+    
+    timestart = datetime.now()
     a = np.arange(0,10,0.1)
     b = np.arange(5,20,0.1)
     bias = [np.random.sample()/ 100.0 for i in range(100)]
@@ -234,7 +251,9 @@ def test():
     x = np.array([  [   [a[i] * 0.1 + np.random.sample()/ 100.0, (b[i]) * 0.1 - np.random.sample()/ 100.0,] for i in range(100)]   for j in range(5) ])
     y = np.array([  [ [x[0][i][0] //0.5 ] for i in range(100)  ] for j in range(5) ])
 
-
+    timeend = datetime.now()
+    print("data loading: %s second",  (timeend - timestart).total_seconds())
+    
     orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
 
     model = RNN(4, 10, 1)
