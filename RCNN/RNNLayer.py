@@ -133,7 +133,8 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
 
         if(epoch % VALID_EVERY == 0):
             if(trainDatalen < len(Y_train)):
-                validatTest(model, X_train[trainDatalen], Y_train[trainDatalen])
+                validatTest(model, X_train[0], Y_train[0], 0)
+                validatTest(model, X_train[trainDatalen], Y_train[trainDatalen], 1)
 
 def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
     orgnizeddatainput = []
@@ -188,11 +189,14 @@ def accuracy(predicted, actual):
             correct += 1
     return correct / total
 
-def validatTest(model, x_valid, y_valid):
-     for i in range(len(y_valid)):
-         re = model.predict(x_valid)
-         precision, recall, f = evaluationF(re, y_valid)
-         print("validation test (%s): precision(%s),  recall(%s), f(%s)", (i, precision, recall, f))
+def validatTest(model, x_valid, y_valid, sig):
+     #for i in range(len(y_valid)):
+     re = model.predict(x_valid)
+     precision, recall, f = evaluationF(re, y_valid)
+     if(sig == 0):
+        print("training test : precision(%s),  recall(%s), f(%s)", (precision, recall, f))
+     else:
+        print("validation test : precision(%s),  recall(%s), f(%s)", (precision, recall, f))
 
 def test():
     a = np.arange(0,10,0.1)
