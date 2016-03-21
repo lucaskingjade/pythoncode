@@ -115,7 +115,7 @@ class RNN:
         
         timeend = datetime.now()
         
-        print("model building: %s second",  (timeend - timestart).total_seconds())
+        print("model building: %s second" % (timeend - timestart).total_seconds())
 
     def calculate_total_loss(self, X, Y):
         return np.sum([self.ce_error(x,y) for x,y in zip(X,Y)])
@@ -173,10 +173,10 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
             
         timeloop = datetime.now()
         
-        print("%s epoch: %s second",  (timeloop - timestart).total_seconds())
+        print("%s epoch: %s second" %  (timeloop - timestart).total_seconds())
             
     timeend = datetime.now()
-    print("total train: %s second",  (timeend - timebegin).total_seconds())
+    print("total train: %s second" %  (timeend - timebegin).total_seconds())
 
 def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
     orgnizeddatainput = []
@@ -236,9 +236,9 @@ def validatTest(model, x_valid, y_valid, sig):
      re = model.predict(x_valid)
      precision, recall, f = evaluationF(re, y_valid)
      if(sig == 0):
-        print("training test : precision(%s),  recall(%s), f(%s)", (precision, recall, f))
+        print("training test : precision(%s),  recall(%s), f(%s)" % (precision, recall, f))
      else:
-        print("validation test : precision(%s),  recall(%s), f(%s)", (precision, recall, f))
+        print("validation test : precision(%s),  recall(%s), f(%s)" % (precision, recall, f))
 
 def test():
     
@@ -252,7 +252,7 @@ def test():
     y = np.array([  [ [x[0][i][0] //0.5 ] for i in range(100)  ] for j in range(5) ])
 
     timeend = datetime.now()
-    print("data loading: %s second",  (timeend - timestart).total_seconds())
+    print("data loading: %s second" %  (timeend - timestart).total_seconds())
     
     orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
 
