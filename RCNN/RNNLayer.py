@@ -53,9 +53,11 @@ class RNNLayer:
         return T.sum(T.nnet.binary_crossentropy(output, y))
     
     def save_model_parameters_theano(self, outfile):
+        ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
+        MODEL_OUTPUT_FILE = "RNN-%s.dat" % (ts)
         U, V, W, B, BO = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value()
         np.savez(outfile, U=U, V=V, W=W, B=B, BO=BO)
-        print ("Saved model parameters to %s." % outfile)
+        print ("Saved model parameters to %s." % MODEL_OUTPUT_FILE)
    
     def load_model_parameters_theano(self, path):
         npzfile = np.load(path)
@@ -73,8 +75,8 @@ LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
 NEPOCH = int(os.environ.get("NEPOCH", "51"))
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
 PRINT_EVERY = int(os.environ.get("PRINT_EVERY", "10"))
-VALID_EVERY = int(os.environ.get("VALID_EVERY", "5"))
-SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "2"))
+VALID_EVERY = int(os.environ.get("VALID_EVERY", "10"))
+SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "5"))
 
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
 if not MODEL_OUTPUT_FILE:
@@ -134,8 +136,9 @@ class RNN:
         self.layer.load_model_parameters_theano(path)
 
 def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH, evaluate_loss_after=PRINT_EVERY):
-    
-    flog = open('logEvaluation.txt', 'a')
+    ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
+    log_OUTPUT_FILE = "RNN_log_%s.dat" % (ts)
+    flog = open(log_OUTPUT_FILE, 'a')
 
     # We keep track of the losses so we can plot them later
     timebegin = datetime.now()
