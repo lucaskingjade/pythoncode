@@ -55,7 +55,7 @@ class RNNLayer:
     def save_model_parameters_theano(self, outfile):
         U, V, W, B, BO = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value()
         np.savez(outfile, U=U, V=V, W=W, B=B, BO=BO)
-    #print ("Saved model parameters to %s." % outfile)
+        print ("Saved model parameters to %s." % outfile)
    
     def load_model_parameters_theano(self, path):
         npzfile = np.load(path)
@@ -66,14 +66,15 @@ class RNNLayer:
         self.W.set_value(W)
         self.B.set_value(B)
         self.BO.set_value(BO)
+        print ("load model parameters to %s." % path)
 
 
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
-NEPOCH = int(os.environ.get("NEPOCH", "100"))
+NEPOCH = int(os.environ.get("NEPOCH", "51"))
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
 PRINT_EVERY = int(os.environ.get("PRINT_EVERY", "10"))
 VALID_EVERY = int(os.environ.get("VALID_EVERY", "5"))
-SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "10"))
+SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "2"))
 
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
 if not MODEL_OUTPUT_FILE:
@@ -133,6 +134,9 @@ class RNN:
         self.layer.load_model_parameters_theano(path)
 
 def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH, evaluate_loss_after=PRINT_EVERY):
+    
+    flog = open('logEvaluation.txt', 'a')
+
     # We keep track of the losses so we can plot them later
     timebegin = datetime.now()
     losses = []
@@ -158,6 +162,8 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
             #print(yo[1])
             #bptt_gradients = model.bptt(X_train[i], y_train[i])
             o_error = model.sgd_step(X_train[i], Y_train[i], learning_rate)
+            str = '%s, '% (o_error[0])
+            flog.write(str)
             if(i % 20 == 0):
                 print("output error")
                 print(o_error)
@@ -177,6 +183,7 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
             
     timeend = datetime.now()
     print("total train: %s second" %  (timeend - timebegin).total_seconds())
+    flog.close()
 
 def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
     orgnizeddatainput = []
@@ -242,6 +249,7 @@ def validatTest(model, x_valid, y_valid, sig):
 
 def test():
     
+    #np.savez("aa.txt", U=1, V=1, W=1, B=1, BO=1)
     timestart = datetime.now()
     a = np.arange(0,10,0.1)
     b = np.arange(5,20,0.1)
