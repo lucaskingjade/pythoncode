@@ -137,7 +137,7 @@ class RNN:
 
 def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH, evaluate_loss_after=PRINT_EVERY):
     ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
-    log_OUTPUT_FILE = "RNN_log_%s.dat" % (ts)
+    log_OUTPUT_FILE = "RNN_log_%s.log" % (ts)
     flog = open(log_OUTPUT_FILE, 'a')
 
     # We keep track of the losses so we can plot them later
@@ -165,12 +165,12 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
             #print(yo[1])
             #bptt_gradients = model.bptt(X_train[i], y_train[i])
             o_error = model.sgd_step(X_train[i], Y_train[i], learning_rate)
-            str = '%s, '% (o_error[0])
-            flog.write(str)
-            if(i % 20 == 0):
+            num_examples_seen += 1
+            if(num_examples_seen % 20 == 0):
+                str = '%s, '% (o_error[0])
+                flog.write(str)
                 print("output error")
                 print(o_error)
-            num_examples_seen += 1
 
         if(epoch % VALID_EVERY == 0):
             if(trainDatalen < len(Y_train)):
