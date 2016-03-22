@@ -56,7 +56,7 @@ class RNNLayer:
         ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
         MODEL_OUTPUT_FILE = "RNN-%s.dat" % (ts)
         U, V, W, B, BO = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value()
-        np.savez(outfile, U=U, V=V, W=W, B=B, BO=BO)
+        np.savez(MODEL_OUTPUT_FILE, U=U, V=V, W=W, B=B, BO=BO)
         print ("Saved model parameters to %s." % MODEL_OUTPUT_FILE)
    
     def load_model_parameters_theano(self, path):
@@ -74,9 +74,8 @@ class RNNLayer:
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
 NEPOCH = int(os.environ.get("NEPOCH", "51"))
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
-PRINT_EVERY = int(os.environ.get("PRINT_EVERY", "2"))
 VALID_EVERY = int(os.environ.get("VALID_EVERY", "10"))
-SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "5"))
+SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "1"))
 
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
 if not MODEL_OUTPUT_FILE:
@@ -147,19 +146,6 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
     trainDatalen = int(len(Y_train) * 0.6)
     for epoch in range(nepoch):
         timestart = datetime.now()
-        # Optionally evaluate the loss
-        if (epoch % evaluate_loss_after == 0):
-            loss = model.calculate_loss(X_train, Y_train)
-            losses.append((num_examples_seen, loss))
-            str = '%s, '% (loss)
-            flog.write(str)
-            time = (datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            print ("%s: Loss after num_examples_seen=%d epoch=%d: %f" % (time, num_examples_seen, epoch, loss))
-            # Adjust the learning rate if loss increases
-            if (len(losses) > 1 and losses[-1][1] > losses[-2][1]):
-                learning_rate = learning_rate * 0.5
-                print ("Setting learning rate to %f" % learning_rate)
-            sys.stdout.flush()
         # For each training example...
         for i in range(trainDatalen):
             # One SGD step
@@ -175,7 +161,20 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
                 validatTest(model, X_train[trainDatalen + 1], Y_train[trainDatalen + 1], 1)
                 
         if(epoch % SAVE_EVERY == 0):
+            loss = model.calculate_loss(X_train, Y_train)
+            losses.append((num_examples_seen, loss))
+            str = '%s, '% (loss)
+            flog.write(str)
+            time = (datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print ("%s: Loss after num_examples_seen=%d epoch=%d: %f" % (time, num_examples_seen, epoch, loss))
+            # Adjust the learning rate if loss increases
+            if (len(losses) > 1 and losses[-1][1] > losses[-2][1]):
+                learning_rate = learning_rate * 0.5
+                print ("Setting learning rate to %f" % learning_rate)
+            sys.stdout.flush()
+            
             model.layer.save_model_parameters_theano(MODEL_OUTPUT_FILE)
+            print("learning rate: %s" % learning_rate)
             
         timeloop = datetime.now()
         
@@ -270,6 +269,7 @@ def test():
     orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
 
     model = RNN(4, 10, 1)
+    model.loadFile("RNN-2016-03-22-16-26.dat.npz")
 
     train_with_sgd(model, orgnizeddatainput, orgnizeddataoutput)
     #orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
