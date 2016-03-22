@@ -74,7 +74,7 @@ class RNNLayer:
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
 NEPOCH = int(os.environ.get("NEPOCH", "51"))
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
-PRINT_EVERY = int(os.environ.get("PRINT_EVERY", "10"))
+PRINT_EVERY = int(os.environ.get("PRINT_EVERY", "2"))
 VALID_EVERY = int(os.environ.get("VALID_EVERY", "10"))
 SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "5"))
 
@@ -151,6 +151,8 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
         if (epoch % evaluate_loss_after == 0):
             loss = model.calculate_loss(X_train, Y_train)
             losses.append((num_examples_seen, loss))
+            str = '%s, '% (loss)
+            flog.write(str)
             time = (datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             print ("%s: Loss after num_examples_seen=%d epoch=%d: %f" % (time, num_examples_seen, epoch, loss))
             # Adjust the learning rate if loss increases
@@ -161,14 +163,9 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
         # For each training example...
         for i in range(trainDatalen):
             # One SGD step
-            #yo = model.forward_propagation(X_train[i])
-            #print(yo[1])
-            #bptt_gradients = model.bptt(X_train[i], y_train[i])
             o_error = model.sgd_step(X_train[i], Y_train[i], learning_rate)
             num_examples_seen += 1
-            if(num_examples_seen % 20 == 0):
-                str = '%s, '% (o_error[0])
-                flog.write(str)
+            if(num_examples_seen % 100 == 0):
                 print("output error")
                 print(o_error)
 
@@ -187,6 +184,11 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
     timeend = datetime.now()
     print("total train: %s second" %  (timeend - timebegin).total_seconds())
     flog.close()
+    
+    
+def crossvalidate(model):
+    train_with_sgd(model, X_train, Y_train)
+    loss = model.calculate_loss(X_train, Y_train)
 
 def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
     orgnizeddatainput = []
