@@ -172,7 +172,7 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
                 learning_rate = learning_rate * 0.5
                 print ("Setting learning rate to %f" % learning_rate)
             sys.stdout.flush()
-            if((losses[-2][1] - losses[-1][1]) < losses[-1][1] * 0.001):
+            if(abs(losses[-2][1] - losses[-1][1]) < losses[-1][1] * 0.001):
                 print("difference error is small")
             
             model.layer.save_model_parameters_theano(MODEL_OUTPUT_FILE)
