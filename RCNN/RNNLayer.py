@@ -134,7 +134,7 @@ class RNN:
     def loadFile(self, path):
         self.layer.load_model_parameters_theano(path)
 
-def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH, evaluate_loss_after=PRINT_EVERY):
+def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH):
     ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
     log_OUTPUT_FILE = "RNN_log_%s.log" % (ts)
     flog = open(log_OUTPUT_FILE, 'a')
