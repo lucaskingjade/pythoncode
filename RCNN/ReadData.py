@@ -4,6 +4,7 @@ import operator
 import sys
 import math
 from enum import Enum
+import numpy as np
 
 class AcousticsIndex(Enum):
     time = 0
@@ -64,9 +65,9 @@ def readPhaseLabels(filename):
 
 
 
-def test():
-    data = readAcoustics("2601/AA002601_brian.txt")
+def translateData():
     head = ['time', 'pitch', 'RMS', 'intensity', 'loudness', 'noLaugh', 'smallLaugh', 'bigLaugh', 'laughingAndSpeaking', 'noGeste', 'prep', 'stroke', 'retract']
+    data = readAcoustics("2601/AA002601_brian.txt")
     head2, dataAudio = readAudioLabels("2601/AA002601_audio.txt")
     head3, dataPhase = readPhaseLabels("2601/AA002601_phase.txt")
     finalData = []
@@ -158,4 +159,56 @@ def test():
         print(linedata)
     
     saveFinalData('AA002601_brianFinal.txt', finalData)
-test()
+    
+def readFinalData(filename):
+    data = []
+    in_file = open(filename, "rt")
+    in_line = in_file.readline()
+    head = in_line.split(" ")
+    while True:
+        in_line = in_file.readline()
+        if not in_line:
+            break
+        in_line = in_line[:-1]
+        object = [time, pitch, RMS, intensity, loudness, noLaugh, smallLaugh, bigLaugh, laughingAndSpeaking, noGeste, prep, stroke, retract] = in_line.split(" ")
+        data.append(object);
+    in_file.close()
+    return head, data
+
+def getData(type, data):
+    if(type == 'laugh'):
+        object = [[data[i][j] for j in range(9)] for i in range(len(data))]
+        #print(objet[2164])
+        return object
+    elif (type == 'geste'):
+        object = [[data[i][j] for j in [0,1,2,3,4,9,10,11,12]] for i in range(len(data))]
+        #print(objet[2164])
+        return object
+    
+def getXY(data):
+    x = [[data[i][j] for j in [0,1,2,3,4]] for i in range(len(data))]
+    y = [[data[i][j] for j in [5,6,7,8]] for i in range(len(data))]
+    return x, y
+
+def buildData():
+    files = ['AA002601_brianFinal.txt']
+    datasetX = []
+    datasetY = []
+    for file in files:
+        head, data = readFinalData(file)
+        d = getData('laugh', data)
+        #d = getData('geste', data)
+        x, y = getXY(d)
+        datasetX.append(x)
+        datasetY.append(y)
+    npX = np.asarray(datasetX) 
+    npY = np.asarray(datasetY) 
+    return npX, npY
+        
+        
+buildData()   
+#translateData()
+#head, data = readFinalData('AA002601_brianFinal.txt')
+#data1 = getData('laugh', data)
+#data2 = getData('geste', data)
+#x, y = getXY(data1)
