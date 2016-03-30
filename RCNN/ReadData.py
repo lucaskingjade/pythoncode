@@ -65,11 +65,14 @@ def readPhaseLabels(filename):
 
 
 
-def translateData():
+def translateData(file1, file2, file3):
     head = ['time', 'pitch', 'RMS', 'intensity', 'loudness', 'noLaugh', 'smallLaugh', 'bigLaugh', 'laughingAndSpeaking', 'noGeste', 'prep', 'stroke', 'retract']
-    data = readAcoustics("2601/AA002601_brian.txt")
-    head2, dataAudio = readAudioLabels("2601/AA002601_audio.txt")
-    head3, dataPhase = readPhaseLabels("2601/AA002601_phase.txt")
+    #data = readAcoustics("2601/AA002601_brian.txt")
+    #head2, dataAudio = readAudioLabels("2601/AA002601_audio.txt")
+    #head3, dataPhase = readPhaseLabels("2601/AA002601_phase.txt")
+    data = readAcoustics(file1+'.txt')
+    head2, dataAudio = readAudioLabels(file2+'.txt')
+    head3, dataPhase = readPhaseLabels(file3+'.txt')
     finalData = []
     finalData.append(head)
     
@@ -158,7 +161,7 @@ def translateData():
         finalData.append(linedata)
         print(linedata)
     
-    saveFinalData('AA002601_brianFinal.txt', finalData)
+    saveFinalData(file1+'Final.txt', finalData)
     
 def readFinalData(filename):
     data = []
@@ -190,13 +193,14 @@ def getXY(data):
     y = [[data[i][j] for j in [5,6,7,8]] for i in range(len(data))]
     return x, y
 
-def buildData():
-    files = ['AA002601_brianFinal.txt']
+def buildData(type='laugh'):
+    files = ['AA002501_brianFinal','AA002601_brianFinal','AA002602_brianFinal','AA000201_BriceFinal','AA000201_carolineFinal','AA000202_BriceFinal','AA000202_carolineFinal','AA000301_kenFinal','AA000302_kenFinal','AA000303_kenFinal']
+    path = 'C:/Users/Jing/Videos/final/'
     datasetX = []
     datasetY = []
     for file in files:
-        head, data = readFinalData(file)
-        d = getData('laugh', data)
+        head, data = readFinalData(path+file+'.txt')
+        d = getData(type, data)
         #d = getData('geste', data)
         x, y = getXY(d)
         datasetX.append(x)
@@ -206,8 +210,22 @@ def buildData():
     return npX, npY
         
         
-buildData()   
-#translateData()
+#buildData()   
+#translateData('C:/Users/Jing/Videos/all/AA000201_Brice','C:/Users/Jing/Videos/LaughterAnnotation/AA000201(1)_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000201(1)_phase') 
+#translateData('C:/Users/Jing/Videos/all/AA000201_caroline','C:/Users/Jing/Videos/LaughterAnnotation/AA000201_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000201_phase') 
+#translateData('C:/Users/Jing/Videos/all/AA000202_Brice','C:/Users/Jing/Videos/LaughterAnnotation/AA000202(1)_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000202(1)_phase') 
+#translateData('C:/Users/Jing/Videos/all/AA000202_caroline','C:/Users/Jing/Videos/LaughterAnnotation/AA000202_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000202_phase') 
+
+#translateData('C:/Users/Jing/Videos/all/AA000301_ken','C:/Users/Jing/Videos/LaughterAnnotation/AA000301_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000301_phase') 
+#translateData('C:/Users/Jing/Videos/all/AA000302_ken','C:/Users/Jing/Videos/LaughterAnnotation/AA000302_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000302_phase') 
+#translateData('C:/Users/Jing/Videos/all/AA000303_ken','C:/Users/Jing/Videos/LaughterAnnotation/AA000303_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000303_phase') 
+
+#translateData('C:/Users/Jing/Videos/all/AA002501_brian','C:/Users/Jing/Videos/LaughterAnnotation/AA002501_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002501_phase') 
+#translateData('C:/Users/Jing/Videos/all/AA002601_brian','C:/Users/Jing/Videos/LaughterAnnotation/AA002601_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002601_phase') 
+#translateData('C:/Users/Jing/Videos/all/AA002602_brian','C:/Users/Jing/Videos/LaughterAnnotation/AA002602_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002602_phase') 
+
+buildData()
+
 #head, data = readFinalData('AA002601_brianFinal.txt')
 #data1 = getData('laugh', data)
 #data2 = getData('geste', data)
