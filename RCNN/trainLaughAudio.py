@@ -9,6 +9,14 @@ import sys
 import math
 from datetime import datetime
 from ReadData import *
+from RNNLayer import *
 
+
+timestart = datetime.now()
 npx, npy= buildData('laugh')
-print('data is load')
+timeend = datetime.now()
+print("data loading: %s second" %  (timeend - timestart).total_seconds())
+
+#orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 4)
+
+#model = RNN(4, 10, 1)

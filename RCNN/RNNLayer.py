@@ -268,7 +268,7 @@ def test():
     timeend = datetime.now()
     print("data loading: %s second" %  (timeend - timestart).total_seconds())
     
-    orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
+    orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 4)
 
     model = RNN(4, 10, 1)
     model.loadFile("RNN-2016-03-22-16-26.dat.npz")

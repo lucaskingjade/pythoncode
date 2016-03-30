@@ -189,7 +189,7 @@ def getData(type, data):
         return object
     
 def getXY(data):
-    x = [[data[i][j] for j in [0,1,2,3,4]] for i in range(len(data))]
+    x = [[data[i][j] for j in [1,2,3,4]] for i in range(len(data))]
     y = [[data[i][j] for j in [5,6,7,8]] for i in range(len(data))]
     return x, y
 
