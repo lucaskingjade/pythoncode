@@ -50,10 +50,10 @@ class RNNLayer:
                                       strict=True)
 
     def binary_crossentropy(self, output, y):
-        return T.mean(T.nnet.binary_crossentropy(output, y))
+        return T.sum(T.nnet.binary_crossentropy(output, y))
     
     def categorical_crossentropy(self, output, y):
-        return T.mean(T.nnet.categorical_crossentropy(output, y))
+        return T.sum(T.nnet.categorical_crossentropy(output, y))
     
     def save_model_parameters_theano(self, outfile):
         ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
