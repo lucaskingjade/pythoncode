@@ -17,8 +17,8 @@ class RNNLayer:
             a = T.dot(U, x_t)
             b = T.dot(W, s_t_p)
             s_t = T.tanh(a + B + b)
-            o_t = T.clip(T.nnet.sigmoid(T.dot(V, s_t) + BO), 0.0000001,0.9999999)
-            return [o_t, s_t]
+            o_t = T.clip(T.nnet.softmax(T.dot(V, s_t) + BO), 0.0000001,0.9999999)
+            return [o_t[0], s_t]
 
         self.input = input
         self.input_dim = inputdim # + 1
@@ -51,6 +51,9 @@ class RNNLayer:
 
     def binary_crossentropy(self, output, y):
         return T.sum(T.nnet.binary_crossentropy(output, y))
+    
+    def categorical_crossentropy(self, output, y):
+        return T.sum(T.nnet.categorical_crossentropy(output, y))
     
     def save_model_parameters_theano(self, outfile):
         ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
@@ -93,7 +96,7 @@ class RNN:
 
         self.layer = RNNLayer(x, inputdim, hiddendim, outputdim)
 
-        o_error = self.layer.binary_crossentropy(self.layer.output, y)
+        o_error = self.layer.categorical_crossentropy(self.layer.output, y)
 
         grads = T.grad(o_error, self.layer.params)
 
@@ -150,15 +153,16 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
         for i in range(trainDatalen):
             # One SGD step
             o_error = model.sgd_step(X_train[i], Y_train[i], learning_rate)
+            #y = model.forward_propagation(X_train[i])
             num_examples_seen += 1
-            if(num_examples_seen % 100 == 0):
-                print("output error")
-                print(o_error)
+            #if(num_examples_seen % 100 == 0):
+            print("output error")
+            print(o_error)
 
-        if(epoch % VALID_EVERY == 0):
-            if(trainDatalen < len(Y_train)):
-                validatTest(model, X_train[0], Y_train[0], 0)
-                validatTest(model, X_train[trainDatalen + 1], Y_train[trainDatalen + 1], 1)
+        #if(epoch % VALID_EVERY == 0):
+         #   if(trainDatalen < len(Y_train)):
+          #      validatTest(model, X_train[0], Y_train[0], 0)
+           #     validatTest(model, X_train[trainDatalen + 1], Y_train[trainDatalen + 1], 1)
                 
         if(epoch % SAVE_EVERY == 0):
             loss = model.calculate_loss(X_train, Y_train)
@@ -172,8 +176,8 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
                 learning_rate = learning_rate * 0.5
                 print ("Setting learning rate to %f" % learning_rate)
             sys.stdout.flush()
-            if(abs(losses[-2][1] - losses[-1][1]) < losses[-1][1] * 0.001):
-                print("difference error is small")
+            #if(abs(losses[-2][1] - losses[-1][1]) < losses[-1][1] * 0.001):
+             #   print("difference error is small")
             
             model.layer.save_model_parameters_theano(MODEL_OUTPUT_FILE)
             print("learning rate: %s" % learning_rate)
@@ -194,27 +198,28 @@ def crossvalidate(model):
 def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
     orgnizeddatainput = []
     orgnizeddataoutput = []
-    TShape = datainput.shape
-    for i in range(TShape[0]):
-        for j in range(TShape[1]):
-            framesnb = TShape[1]
-            numberofUnit = int(framesnb /  frame_perunit)
-            less = framesnb % frame_perunit
+    size0 = len(datainput)
+    for i in range(size0):
+        data0 = datainput[i]
+        size1 = len(data0)
+        framesnb = size1
+        numberofUnit = int(framesnb /  frame_perunit)
+        less = framesnb % frame_perunit
 
-            for shift in range(frame_perunit):
-                sequence = []
-                sequenceout = []
-                if (less == 0 or shift < less):
-                    numberofUnitlocal = numberofUnit
-                else:
-                    numberofUnitlocal = numberofUnit - 1
-                for n in range(numberofUnitlocal - 1):
-                    unit = datainput[i][n *  frame_perunit + shift: (n + 1) * frame_perunit + shift]
-                    unitflat = unit.flatten()
-                    sequence.append(unitflat)
-                    sequenceout.append(dataoutput[i][(n + 1) * frame_perunit + shift])
-                orgnizeddatainput.append(sequence)
-                orgnizeddataoutput.append(sequenceout)
+        for shift in range(frame_perunit):
+            sequence = []
+            sequenceout = []
+            if (less == 0 or shift < less):
+                numberofUnitlocal = numberofUnit
+            else:
+                numberofUnitlocal = numberofUnit - 1
+            for n in range(numberofUnitlocal - 1):
+                unit = datainput[i][n *  frame_perunit + shift: (n + 1) * frame_perunit + shift]
+                unitflat = [y for x in unit for y in x]
+                sequence.append(unitflat)
+                sequenceout.append(dataoutput[i][(n + 1) * frame_perunit + shift])
+            orgnizeddatainput.append(sequence)
+            orgnizeddataoutput.append(sequenceout)
     return orgnizeddatainput, orgnizeddataoutput
 
 def evaluationF(predicted, actual):
@@ -262,19 +267,19 @@ def test():
     bias = [np.random.sample()/ 100.0 for i in range(100)]
     bias2 = [np.random.sample()/ 100.0 for i in range(100)]
     bias3 = [np.random.sample()/ 100.0 for i in range(100)]
-    x = np.array([  [   [a[i] * 0.1 + np.random.sample()/ 100.0, (b[i]) * 0.1 - np.random.sample()/ 100.0,] for i in range(100)]   for j in range(5) ])
-    y = np.array([  [ [x[0][i][0] //0.5 ] for i in range(100)  ] for j in range(5) ])
+    x = np.array([  [   [a[i] * 0.1 + np.random.sample()/ 100.0, (b[i]) * 0.1 - np.random.sample()/ 100.0] for i in range(100)]   for j in range(5) ])
+    y = np.array([  [ [x[0][i][0] //0.5, 1-x[0][i][0] //0.5 ] for i in range(100)  ] for j in range(5) ])
 
     timeend = datetime.now()
     print("data loading: %s second" %  (timeend - timestart).total_seconds())
     
     orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 4)
 
-    model = RNN(4, 10, 1)
-    model.loadFile("RNN-2016-03-22-16-26.dat.npz")
+    model = RNN(4, 10, 2)
+    #model.loadFile("RNN-2016-03-22-16-26.dat.npz")
 
     train_with_sgd(model, orgnizeddatainput, orgnizeddataoutput)
     #orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 2)
 
 
-test()
+#test()

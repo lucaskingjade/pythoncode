@@ -180,11 +180,11 @@ def readFinalData(filename):
 
 def getData(type, data):
     if(type == 'laugh'):
-        object = [[data[i][j] for j in range(9)] for i in range(len(data))]
+        object = [[float(data[i][j]) for j in range(9)] for i in range(len(data))]
         #print(objet[2164])
         return object
     elif (type == 'geste'):
-        object = [[data[i][j] for j in [0,1,2,3,4,9,10,11,12]] for i in range(len(data))]
+        object = [[float(data[i][j]) for j in [0,1,2,3,4,9,10,11,12]] for i in range(len(data))]
         #print(objet[2164])
         return object
     
@@ -224,7 +224,7 @@ def buildData(type='laugh'):
 #translateData('C:/Users/Jing/Videos/all/AA002601_brian','C:/Users/Jing/Videos/LaughterAnnotation/AA002601_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002601_phase') 
 #translateData('C:/Users/Jing/Videos/all/AA002602_brian','C:/Users/Jing/Videos/LaughterAnnotation/AA002602_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002602_phase') 
 
-buildData()
+#buildData()
 
 #head, data = readFinalData('AA002601_brianFinal.txt')
 #data1 = getData('laugh', data)
