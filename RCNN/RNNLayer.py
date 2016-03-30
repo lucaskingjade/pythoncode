@@ -50,10 +50,10 @@ class RNNLayer:
                                       strict=True)
 
     def binary_crossentropy(self, output, y):
-        return T.sum(T.nnet.binary_crossentropy(output, y))
+        return T.mean(T.nnet.binary_crossentropy(output, y))
     
     def categorical_crossentropy(self, output, y):
-        return T.sum(T.nnet.categorical_crossentropy(output, y))
+        return T.mean(T.nnet.categorical_crossentropy(output, y))
     
     def save_model_parameters_theano(self, outfile):
         ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
@@ -74,7 +74,7 @@ class RNNLayer:
         print ("load model parameters to %s." % path)
 
 
-LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
+LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.01"))
 NEPOCH = int(os.environ.get("NEPOCH", "51"))
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
 VALID_EVERY = int(os.environ.get("VALID_EVERY", "10"))

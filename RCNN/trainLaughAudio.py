@@ -40,16 +40,17 @@ def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, n
             o_error = model.sgd_step(X_train[i], Y_train[i], learning_rate)
             #y = model.forward_propagation(X_train[i])
             num_examples_seen += 1
-            #if(num_examples_seen % 100 == 0):
-            print("output error")
-            print(o_error)
+            if(num_examples_seen % 100 == 0):
+                print("output error")
+                print(o_error)
 
         #if(epoch % VALID_EVERY == 0):
          #   if(trainDatalen < len(Y_train)):
           #      validatTest(model, X_train[0], Y_train[0], 0)
            #     validatTest(model, X_train[trainDatalen + 1], Y_train[trainDatalen + 1], 1)
                 
-        if(epoch % SAVE_EVERY == 0):
+        #if(epoch % SAVE_EVERY == 0):
+        if(epoch % 1 == 0):
             loss = model.calculate_loss(X_train, Y_train)
             losses.append((num_examples_seen, loss))
             str = '%s, '% (loss)
