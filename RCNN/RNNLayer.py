@@ -151,7 +151,7 @@ class RNNLayer2:
         self.BO.set_value(BO)
         print ("load model parameters to %s." % path)
 
-LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.1"))
+LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
 NEPOCH = int(os.environ.get("NEPOCH", "51"))
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
 VALID_EVERY = int(os.environ.get("VALID_EVERY", "10"))
