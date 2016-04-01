@@ -103,7 +103,7 @@ class RNNLayer2:
         def forward_recurrent_step(x_t, s_t_p, U, W, V, B, BO, W2, B2):
             a = T.dot(U, x_t)
             b = T.dot(W, s_t_p)
-            s_t0 = a + B + b
+            s_t0 = T.tanh(a + B + b)
             s_t1 = T.dot(W2, s_t0) + B2
             s_t = T.tanh(s_t1)
             o_t = T.clip(T.nnet.softmax(T.dot(V, s_t) + BO), 0.0000001,0.9999999)
