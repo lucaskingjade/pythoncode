@@ -80,8 +80,8 @@ class RNNLayer:
         ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
         MODEL_OUTPUT_FILE = "RNN-%s.dat" % (ts)
         U, V, W, B, BO = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value()
-        np.savez(MODEL_OUTPUT_FILE, U=U, V=V, W=W, B=B, BO=BO)
-        print ("Saved model parameters to %s." % MODEL_OUTPUT_FILE)
+        np.savez('RNN_parameters.dat', U=U, V=V, W=W, B=B, BO=BO)
+        print ("Saved model parameters to %s." % 'RNN_parameters.dat')
    
     def load_model_parameters_theano(self, path):
         npzfile = np.load(path)
@@ -157,18 +157,20 @@ class RNNLayer2:
         ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
         MODEL_OUTPUT_FILE = "RNN-%s.dat" % (ts)
         U, V, W, B, BO,U2,B2 = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value(), self.U2.get_value(),self.B2.get_value()
-        np.savez(MODEL_OUTPUT_FILE, U=U, V=V, W=W, B=B, BO=BO, U2=U2, B2=B2)
-        print ("Saved model parameters to %s." % MODEL_OUTPUT_FILE)
+        np.savez('RNN_parameters.dat', U=U, V=V, W=W, B=B, BO=BO, U2=U2, B2=B2)
+        print ("Saved model parameters to %s." % 'RNN_parameters.dat')
    
     def load_model_parameters_theano(self, path):
         npzfile = np.load(path)
-        U, V, W, B, BO = npzfile["U"], npzfile["V"], npzfile["W"], npzfile["B"], npzfile["BO"]
-        self.hidden_dim = U.shape[0]
+        U, V, W, B, BO, U2, B2 = npzfile["U"], npzfile["V"], npzfile["W"], npzfile["B"], npzfile["BO"], npzfile["U2"], npzfile["B2"]
+        #self.hidden_dim = U.shape[0]
         self.U.set_value(U)
         self.V.set_value(V)
         self.W.set_value(W)
         self.B.set_value(B)
         self.BO.set_value(BO)
+        self.U2.set_value(U2)
+        self.B2.set_value(B2)
         print ("load model parameters to %s." % path)
 
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
