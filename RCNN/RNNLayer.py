@@ -86,7 +86,7 @@ class RNNLayer:
     def load_model_parameters_theano(self, path):
         npzfile = np.load(path)
         U, V, W, B, BO = npzfile["U"], npzfile["V"], npzfile["W"], npzfile["B"], npzfile["BO"]
-        self.hidden_dim = U.shape[0]
+        #self.hidden_dim = U.shape[0]
         self.U.set_value(U)
         self.V.set_value(V)
         self.W.set_value(W)
