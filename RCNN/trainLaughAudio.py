@@ -10,23 +10,28 @@ import math
 from datetime import datetime
 from ReadData import *
 from RNNLayer import *
+from util import *
 
 
 timestart = datetime.now()
-npx, npy= buildData('laugh')
+#npx, npy= buildData('laugh')
+npx, npy= buildData('geste')
 
-orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, 50, 4)
+orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, 20, 4)
+
+#originalLabel = np.argmax(orgnizeddataoutput, axis = 1)
+print("data size: %s " %  (len(orgnizeddatainput)))
 
 timeend = datetime.now()
 print("data loading: %s second" %  (timeend - timestart).total_seconds())
 
-model = RNN(200, 10, 4)
+model = RNN(80, 10, 4)
 
-def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH):
-    ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
-    log_OUTPUT_FILE = "RNN_log_%s.log" % (ts)
-    flog = open(log_OUTPUT_FILE, 'a')
+#acc = calculateAccuracy(model, orgnizeddatainput[0], orgnizeddataoutput[0])
+#p = model.predict(orgnizeddatainput[0])
 
+def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH, writelog=True, saveparameter = False):
+    
     # We keep track of the losses so we can plot them later
     timebegin = datetime.now()
     losses = []
@@ -38,42 +43,41 @@ def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, n
         for i in range(trainDatalen):
             # One SGD step
             o_error = model.sgd_step(X_train[i], Y_train[i], learning_rate)
-            #y = model.forward_propagation(X_train[i])
             num_examples_seen += 1
-            if(num_examples_seen % 100 == 0):
+            if(num_examples_seen % 20 == 0):
                 print("output error")
                 print(o_error)
 
-        #if(epoch % VALID_EVERY == 0):
-         #   if(trainDatalen < len(Y_train)):
-          #      validatTest(model, X_train[0], Y_train[0], 0)
-           #     validatTest(model, X_train[trainDatalen + 1], Y_train[trainDatalen + 1], 1)
-                
-        #if(epoch % SAVE_EVERY == 0):
         if(epoch % 1 == 0):
             loss = model.calculate_loss(X_train, Y_train)
             losses.append((num_examples_seen, loss))
-            str = '%s, '% (loss)
-            flog.write(str)
+            if(writelog):
+                log_OUTPUT_FILE = "RNN_log.log"
+                str = '%s \n'% (loss)
+                writeFile(log_OUTPUT_FILE,str)
+                
             time = (datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
             print ("%s: Loss after num_examples_seen=%d epoch=%d: %f" % (time, num_examples_seen, epoch, loss))
             # Adjust the learning rate if loss increases
             if (len(losses) > 1 and losses[-1][1] > losses[-2][1]):
                 learning_rate = learning_rate * 0.5
                 print ("Setting learning rate to %f" % learning_rate)
-            sys.stdout.flush()
             #if(abs(losses[-2][1] - losses[-1][1]) < losses[-1][1] * 0.001):
              #   print("difference error is small")
-            
-            model.layer.save_model_parameters_theano(MODEL_OUTPUT_FILE)
+            if(saveparameter):
+                model.layer.save_model_parameters_theano(MODEL_OUTPUT_FILE)
             print("learning rate: %s" % learning_rate)
             
         timeloop = datetime.now()
         
         print("%s epoch: %s second" %  (epoch, (timeloop - timestart).total_seconds()))
+        if(writelog):
+            acc = calculateAccuracy(model, X_train[10], Y_train[10])
+            writeFile('speedlog.log',"[%s epoch] [ %s seconds] [learning rate: %s] [accuray: %s] \n" %  (epoch, (timeloop - timestart).total_seconds(), learning_rate, acc))
             
     timeend = datetime.now()
     print("total train: %s second" %  (timeend - timebegin).total_seconds())
-    flog.close()
+    if(writelog):
+        writeFile('speedlog.log', "total train: %s second" %  (timeend - timebegin).total_seconds())
     
 train_with_sgd_cross(model, orgnizeddatainput, orgnizeddataoutput)

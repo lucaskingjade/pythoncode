@@ -8,6 +8,7 @@ import operator
 import sys
 import math
 from datetime import datetime
+from util import *
 
 class RNNLayer:
     #inputshape (t_step, dimfeature)    outputshape(t_step, outfeature)
@@ -206,11 +207,13 @@ class RNN:
             (param_i, param_i - self.learning_rate * grad_i)
             for param_i, grad_i in zip(self.layer.params, grads)
         ]
+        
+        prediction = T.argmax(self.layer.output, axis=1)  #patch prediction
 
         self.forward_propagation = theano.function([x], [self.layer.output])
         self.bptt = theano.function([x, y], grads)
         self.ce_error = theano.function([x, y], o_error)
-
+        self.predict = theano.function([x], prediction)
         self.sgd_step = theano.function([x,y, self.learning_rate], [o_error],
                       updates=updates)
         
@@ -227,9 +230,9 @@ class RNN:
         #return self.calculate_total_loss(X,Y)/float(num_words)
         return self.calculate_total_loss(X,Y)/float(len(Y))
 
-    def predict(self, x):
-        y = self.forward_propagation(x)[0]
-        return y // 0.5
+    #def predict(self, x):
+    #    y = self.forward_propagation(x)[0]
+    #   return y // 0.5
     
     def loadFile(self, path):
         self.layer.load_model_parameters_theano(path)
@@ -345,6 +348,16 @@ def accuracy(predicted, actual):
         if abs(p - a) < 0.5:
             correct += 1
     return correct / total
+
+def calculateAccuracy(model, x, y):
+    yorig = np.argmax(y, axis=1)
+    ynew = model.predict(x)
+    correct = 0
+    for i in range(len(yorig)):
+        if(ynew[i]==yorig[i]):
+            correct += 1
+    acc = correct / len(yorig)
+    return acc
 
 def validatTest(model, x_valid, y_valid, sig):
      #for i in range(len(y_valid)):
