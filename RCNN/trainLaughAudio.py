@@ -15,7 +15,7 @@ from util import *
 
 timestart = datetime.now()
 #npx, npy= buildData('laugh')
-npx, npy= buildData(datapath = 'C:/Users/Jing/Videos/final/', 'geste')
+npx, npy= buildData(datapath = 'final/', type='geste')
 
 orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, 20, 4)
 
