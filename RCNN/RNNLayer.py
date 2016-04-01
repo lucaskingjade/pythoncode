@@ -24,24 +24,42 @@ class RNNLayer:
         self.input_dim = inputdim # + 1
         self.output_dim = outputdim
         self.hidden_dim = hiddendim
-
+        
         self.U = theano.shared(
-            np.random.uniform(-np.sqrt(1./self.input_dim), np.sqrt(1./self.input_dim), (self.hidden_dim, self.input_dim)),
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim, self.input_dim)),
              name = 'U')
         self.W = theano.shared(
-            np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.hidden_dim, self.hidden_dim)),
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim, self.hidden_dim)),
              name = 'W')
         self.B = theano.shared(
-            np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.hidden_dim)),
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim)),
              name = 'B')
         
 
         self.V = theano.shared(
-            np.random.uniform(-np.sqrt(1./self.output_dim), np.sqrt(1./self.output_dim), (self.output_dim, self.hidden_dim)),
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim, self.hidden_dim)),
              name = 'V')
         self.BO = theano.shared(
-            np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.output_dim)),
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim)),
              name = 'BO')
+
+#         self.U = theano.shared(
+#             np.random.uniform(-np.sqrt(1./self.input_dim), np.sqrt(1./self.input_dim), (self.hidden_dim, self.input_dim)),
+#              name = 'U')
+#         self.W = theano.shared(
+#             np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.hidden_dim, self.hidden_dim)),
+#              name = 'W')
+#         self.B = theano.shared(
+#             np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.hidden_dim)),
+#              name = 'B')
+#         
+# 
+#         self.V = theano.shared(
+#             np.random.uniform(-np.sqrt(1./self.output_dim), np.sqrt(1./self.output_dim), (self.output_dim, self.hidden_dim)),
+#              name = 'V')
+#         self.BO = theano.shared(
+#             np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.output_dim)),
+#              name = 'BO')
 
         # store parameters of this layer
         self.params = [self.U, self.V, self.W, self.B,self.BO]
@@ -52,10 +70,10 @@ class RNNLayer:
                                       strict=True)
 
     def binary_crossentropy(self, output, y):
-        return T.sum(T.nnet.binary_crossentropy(output, y))
+        return T.mean(T.nnet.binary_crossentropy(output, y))
     
     def categorical_crossentropy(self, output, y):
-        return T.sum(T.nnet.categorical_crossentropy(output, y))
+        return T.mean(T.nnet.categorical_crossentropy(output, y))
     
     def save_model_parameters_theano(self, outfile):
         ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
@@ -128,10 +146,10 @@ class RNNLayer2:
                                       strict=True)
 
     def binary_crossentropy(self, output, y):
-        return T.sum(T.nnet.binary_crossentropy(output, y))
+        return T.mean(T.nnet.binary_crossentropy(output, y))
     
     def categorical_crossentropy(self, output, y):
-        return T.sum(T.nnet.categorical_crossentropy(output, y))
+        return T.mean(T.nnet.categorical_crossentropy(output, y))
     
     def save_model_parameters_theano(self, outfile):
         ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
@@ -152,7 +170,7 @@ class RNNLayer2:
         print ("load model parameters to %s." % path)
 
 LEARNING_RATE = float(os.environ.get("LEARNING_RATE", "0.001"))
-NEPOCH = int(os.environ.get("NEPOCH", "51"))
+NEPOCH = int(os.environ.get("NEPOCH", "551"))
 MODEL_OUTPUT_FILE = os.environ.get("MODEL_OUTPUT_FILE")
 VALID_EVERY = int(os.environ.get("VALID_EVERY", "10"))
 SAVE_EVERY = int(os.environ.get("SAVE_EVERY", "1"))
@@ -205,8 +223,9 @@ class RNN:
 
     def calculate_loss(self, X, Y):
         # Divide calculate_loss by the number of words
-        num_words = np.sum([len(y) for y in Y])
-        return self.calculate_total_loss(X,Y)/float(num_words)
+        #num_words = np.sum([len(y) for y in Y])
+        #return self.calculate_total_loss(X,Y)/float(num_words)
+        return self.calculate_total_loss(X,Y)/float(len(Y))
 
     def predict(self, x):
         y = self.forward_propagation(x)[0]
