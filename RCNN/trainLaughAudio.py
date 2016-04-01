@@ -38,6 +38,16 @@ def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, n
     num_examples_seen = 0
     trainDatalen = int(len(Y_train) * 0.6)
     testlen = int(len(Y_train))
+    
+    if(writelog):
+        acc = []
+        for x, y in zip(X_train, Y_train):
+           acc.append(calculateAccuracy(model, x, y))
+        acctrain = np.mean(acc[0:trainDatalen])
+        acctest = np.mean(acc[trainDatalen:testlen])
+        writeFile('speedlog.log',"[%s epoch] [ %s seconds] [learning rate: %s] [accuray: %s %s] \n" %  (-1, 0, learning_rate, acctrain, acctest))
+        
+    
     for epoch in range(nepoch):
         timestart = datetime.now()
         # For each training example...
