@@ -15,7 +15,7 @@ from util import *
 
 timestart = datetime.now()
 #npx, npy= buildData('laugh')
-npx, npy= buildData('geste')
+npx, npy= buildData(datapath = 'C:/Users/Jing/Videos/final/', 'geste')
 
 orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, 20, 4)
 
@@ -79,5 +79,7 @@ def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, n
     print("total train: %s second" %  (timeend - timebegin).total_seconds())
     if(writelog):
         writeFile('speedlog.log', "total train: %s second" %  (timeend - timebegin).total_seconds())
+        
+    print('training finish')
     
 train_with_sgd_cross(model, orgnizeddatainput, orgnizeddataoutput)

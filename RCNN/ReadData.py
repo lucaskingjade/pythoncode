@@ -193,9 +193,9 @@ def getXY(data):
     y = [[data[i][j] for j in [5,6,7,8]] for i in range(len(data))]
     return x, y
 
-def buildData(type='laugh'):
+def buildData(datapath = 'C:/Users/Jing/Videos/final/', type='laugh'):
     files = ['AA002501_brianFinal','AA002601_brianFinal','AA002602_brianFinal','AA000201_BriceFinal','AA000201_carolineFinal','AA000202_BriceFinal','AA000202_carolineFinal','AA000301_kenFinal','AA000302_kenFinal','AA000303_kenFinal']
-    path = 'C:/Users/Jing/Videos/final/'
+    path = datapath
     datasetX = []
     datasetY = []
     for file in files:
