@@ -25,7 +25,7 @@ print("data size: %s " %  (len(orgnizeddatainput)))
 timeend = datetime.now()
 print("data loading: %s second" %  (timeend - timestart).total_seconds())
 
-model = RNN(80, 10, 4)
+model = RNN(80, [50,10], 4)
 
 #acc = calculateAccuracy(model, orgnizeddatainput[0], orgnizeddataoutput[0])
 #p = model.predict(orgnizeddatainput[0])
