@@ -77,11 +77,9 @@ class RNNLayer:
         return T.mean(T.nnet.categorical_crossentropy(output, y))
     
     def save_model_parameters_theano(self, outfile):
-        ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
-        MODEL_OUTPUT_FILE = "RNN-%s.dat" % (ts)
         U, V, W, B, BO = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value()
-        np.savez('RNN_parameters.dat', U=U, V=V, W=W, B=B, BO=BO)
-        print ("Saved model parameters to %s." % 'RNN_parameters.dat')
+        np.savez(outfile, U=U, V=V, W=W, B=B, BO=BO)
+        print ("Saved model parameters to %s." % outfile)
    
     def load_model_parameters_theano(self, path):
         npzfile = np.load(path)
@@ -94,7 +92,22 @@ class RNNLayer:
         self.BO.set_value(BO)
         print ("load model parameters to %s." % path)
 
-
+    def reinitialParameters(self):
+        self.U = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim, self.input_dim)),
+             name = 'U')
+        self.W = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim, self.hidden_dim)),
+             name = 'W')
+        self.B = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim)),
+             name = 'B')
+        self.V = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim, self.hidden_dim)),
+             name = 'V')
+        self.BO = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim)),
+             name = 'BO')
 
 class RNNLayer2:
     #inputshape (t_step, dimfeature)    outputshape(t_step, outfeature)
@@ -116,7 +129,7 @@ class RNNLayer2:
         self.hidden_dim2 = hiddendim2
 
         self.U = theano.shared(
-            np.random.uniform(-np.sqrt(1./self.input_dim), np.sqrt(1./self.input_dim), (self.hidden_dim1, self.input_dim)),
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.input_dim)),
              name = 'U')
         self.W = theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.hidden_dim1)),
@@ -133,7 +146,7 @@ class RNNLayer2:
              name = 'B2')
 
         self.V = theano.shared(
-            np.random.uniform(-np.sqrt(1./self.output_dim), np.sqrt(1./self.output_dim), (self.output_dim, self.hidden_dim2)),
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim, self.hidden_dim2)),
              name = 'V')
         self.BO = theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim)),
@@ -146,6 +159,32 @@ class RNNLayer2:
                                       outputs_info=[None, dict(initial=np.zeros(self.hidden_dim1))],
                                       non_sequences=[self.U, self.W, self.V, self.B, self.BO, self.U2,self.B2],
                                       strict=True)
+        
+    def reinitialParameters(self):
+        self.U = theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.input_dim)),
+             name = 'U')
+        self.W = theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.hidden_dim1)),
+             name = 'W')
+        self.B = theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1)),
+             name = 'B')
+        
+        self.U2 = theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim2, self.hidden_dim1)),
+             name = 'U2')
+        self.B2 = theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim2)),
+             name = 'B2')
+
+        self.V = theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim, self.hidden_dim2)),
+             name = 'V')
+        self.BO = theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim)),
+             name = 'BO')
+
 
     def binary_crossentropy(self, output, y):
         return T.mean(T.nnet.binary_crossentropy(output, y))
@@ -154,11 +193,9 @@ class RNNLayer2:
         return T.mean(T.nnet.categorical_crossentropy(output, y))
     
     def save_model_parameters_theano(self, outfile):
-        ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
-        MODEL_OUTPUT_FILE = "RNN-%s.dat" % (ts)
         U, V, W, B, BO,U2,B2 = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value(), self.U2.get_value(),self.B2.get_value()
-        np.savez('RNN_parameters.dat', U=U, V=V, W=W, B=B, BO=BO, U2=U2, B2=B2)
-        print ("Saved model parameters to %s." % 'RNN_parameters.dat')
+        np.savez(outfile, U=U, V=V, W=W, B=B, BO=BO, U2=U2, B2=B2)
+        print ("Saved model parameters to %s." % outfile)
    
     def load_model_parameters_theano(self, path):
         npzfile = np.load(path)
@@ -222,7 +259,7 @@ class RNN:
         
         timeend = datetime.now()
         
-        print("model building: %s second" % (timeend - timestart).total_seconds())
+        print("model building: %f second" % (timeend - timestart).total_seconds())
 
     def calculate_total_loss(self, X, Y):
         return np.sum([self.ce_error(x,y) for x,y in zip(X,Y)])
@@ -237,9 +274,15 @@ class RNN:
     #    y = self.forward_propagation(x)[0]
     #   return y // 0.5
     
+    def reinitialParameters(self):
+        self.layer.reinitialParameters()
+    
     def loadFile(self, path):
         self.layer.load_model_parameters_theano(path)
-
+        
+    def saveParametersInFile(self, path):
+        self.layer.save_model_parameters_theano(path)
+        
 def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=NEPOCH):
     ts = datetime.now().strftime("%Y-%m-%d-%H-%M")
     log_OUTPUT_FILE = "RNN_log_%s.log" % (ts)
@@ -270,10 +313,10 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
         if(epoch % SAVE_EVERY == 0):
             loss = model.calculate_loss(X_train, Y_train)
             losses.append((num_examples_seen, loss))
-            str = '%s, '% (loss)
+            str = '%f, '% (loss)
             flog.write(str)
             time = (datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            print ("%s: Loss after num_examples_seen=%d epoch=%d: %f" % (time, num_examples_seen, epoch, loss))
+            print ("%f: Loss after num_examples_seen=%d epoch=%d: %f" % (time, num_examples_seen, epoch, loss))
             # Adjust the learning rate if loss increases
             if (len(losses) > 1 and losses[-1][1] > losses[-2][1]):
                 learning_rate = learning_rate * 0.5
@@ -283,20 +326,17 @@ def train_with_sgd(model, X_train, Y_train, learning_rate=LEARNING_RATE, nepoch=
              #   print("difference error is small")
             
             model.layer.save_model_parameters_theano(MODEL_OUTPUT_FILE)
-            print("learning rate: %s" % learning_rate)
+            print("learning rate: %f" % learning_rate)
             
         timeloop = datetime.now()
         
-        print("%s epoch: %s second" %  (epoch, (timeloop - timestart).total_seconds()))
+        print("%d epoch: %f second" %  (epoch, (timeloop - timestart).total_seconds()))
             
     timeend = datetime.now()
-    print("total train: %s second" %  (timeend - timebegin).total_seconds())
+    print("total train: %f second" %  (timeend - timebegin).total_seconds())
     flog.close()
     
     
-def crossvalidate(model):
-    train_with_sgd(model, X_train, Y_train)
-    loss = model.calculate_loss(X_train, Y_train)
 
 def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
     orgnizeddatainput = []
@@ -323,7 +363,7 @@ def prepareData(datainput, dataoutput, frame_perunit, feature_perframe):
                 sequenceout.append(dataoutput[i][(n + 1) * frame_perunit + shift])
             orgnizeddatainput.append(sequence)
             orgnizeddataoutput.append(sequenceout)
-    return orgnizeddatainput, orgnizeddataoutput
+    return np.asarray(orgnizeddatainput), np.asarray(orgnizeddataoutput)
 
 def evaluationF(predicted, actual):
     c1c = 0
@@ -359,7 +399,7 @@ def calculateAccuracy(model, x, y):
     for i in range(len(yorig)):
         if(ynew[i]==yorig[i]):
             correct += 1
-    acc = correct / len(yorig)
+    acc = (float)(correct) / (float)(len(yorig))
     return acc
 
 def validatTest(model, x_valid, y_valid, sig):
@@ -367,9 +407,9 @@ def validatTest(model, x_valid, y_valid, sig):
      re = model.predict(x_valid)
      precision, recall, f = evaluationF(re, y_valid)
      if(sig == 0):
-        print("training test : precision(%s),  recall(%s), f(%s)" % (precision, recall, f))
+        print("training test : precision(%f),  recall(%f), f(%f)" % (precision, recall, f))
      else:
-        print("validation test : precision(%s),  recall(%s), f(%s)" % (precision, recall, f))
+        print("validation test : precision(%f),  recall(%f), f(%f)" % (precision, recall, f))
 
 def test():
     
@@ -384,7 +424,7 @@ def test():
     y = np.array([  [ [x[0][i][0] //0.5, 1-x[0][i][0] //0.5 ] for i in range(100)  ] for j in range(5) ])
 
     timeend = datetime.now()
-    print("data loading: %s second" %  (timeend - timestart).total_seconds())
+    print("data loading: %f second" %  (timeend - timestart).total_seconds())
     
     orgnizeddatainput, orgnizeddataoutput = prepareData(x, y, 2, 4)
 
