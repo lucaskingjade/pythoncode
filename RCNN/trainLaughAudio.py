@@ -69,7 +69,7 @@ def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, n
                 writeFile(log_OUTPUT_FILE, strv)
                 
             time = (datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            print ("%f: Loss after num_examples_seen=%d epoch=%d: loss=%f" % (time, num_examples_seen, epoch, loss))
+            print ("%s: Loss after num_examples_seen=%d epoch=%d: loss=%f" % (time, num_examples_seen, epoch, loss))
             # Adjust the learning rate if loss increases
             if (len(losses) > 1 and losses[-1][1] > losses[-2][1]):
                 learning_rate = learning_rate * 0.5
