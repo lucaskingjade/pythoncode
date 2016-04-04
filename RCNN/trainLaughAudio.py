@@ -17,7 +17,7 @@ timestart = datetime.now()
 #npx, npy= buildData(datapath = 'final/', type='laugh')
 npx, npy= buildData(datapath = 'final/', type='geste')
 
-frames = 10
+frames = 5
 features = 4
 orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, frames, features)
 
