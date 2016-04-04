@@ -93,11 +93,11 @@ class RNNLayer:
         print ("load model parameters to %s." % path)
 
     def reinitialParameters(self):
-        self.U.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.input_dim)))
-        self.W.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.hidden_dim1)))
-        self.B.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1)))
+        self.U.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim, self.input_dim)))
+        self.W.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim, self.hidden_dim)))
+        self.B.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim)))
 
-        self.V.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim, self.hidden_dim2)))
+        self.V.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim, self.hidden_dim)))
         self.BO.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim)))
 
 class RNNLayer2:
@@ -208,7 +208,8 @@ class RNN:
 
         self.learning_rate = T.scalar('learning_rate')
 
-        self.layer = RNNLayer2(x, inputdim, hiddendim[0], hiddendim[1], outputdim)
+        #self.layer = RNNLayer2(x, inputdim, hiddendim[0], hiddendim[1], outputdim)
+        self.layer = RNNLayer(x, inputdim, hiddendim, outputdim)
 
         o_error = self.layer.categorical_crossentropy(self.layer.output, y)
 

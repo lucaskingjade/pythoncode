@@ -14,8 +14,8 @@ from util import *
 
 
 timestart = datetime.now()
-npx, npy= buildData(datapath = 'final/', type='laugh')
-#npx, npy= buildData(datapath = 'final/', type='geste')
+#npx, npy= buildData(datapath = 'final/', type='laugh')
+npx, npy= buildData(datapath = 'final/', type='geste')
 
 orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, 20, 4)
 
@@ -25,7 +25,8 @@ print("data size: %d " %  (len(orgnizeddatainput)))
 timeend = datetime.now()
 print("data loading: %f second" %  (timeend - timestart).total_seconds())
 
-model = RNN(80, [50,10], 4)
+#model = RNN(80, [50,10], 4)
+model = RNN(80, 50, 4)
 model.reinitialParameters()
 
 #acc = calculateAccuracy(model, orgnizeddatainput[0], orgnizeddataoutput[0])
