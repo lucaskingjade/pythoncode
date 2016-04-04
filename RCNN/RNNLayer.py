@@ -93,21 +93,22 @@ class RNNLayer:
         print ("load model parameters to %s." % path)
 
     def reinitialParameters(self):
-        self.U = theano.shared(
-            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim, self.input_dim)),
-             name = 'U')
-        self.W = theano.shared(
-            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim, self.hidden_dim)),
-             name = 'W')
-        self.B = theano.shared(
-            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim)),
-             name = 'B')
-        self.V = theano.shared(
-            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim, self.hidden_dim)),
-             name = 'V')
-        self.BO = theano.shared(
-            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim)),
-             name = 'BO')
+        self.U.set_value(theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.input_dim)),
+             name = 'U'))
+        self.W.set_value(theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.hidden_dim1)),
+             name = 'W'))
+        self.B.set_value(theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1)),
+             name = 'B'))
+
+        self.V.set_value(theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim, self.hidden_dim2)),
+             name = 'V'))
+        self.BO.set_value(theano.shared(
+            np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim)),
+             name = 'BO'))
 
 class RNNLayer2:
     #inputshape (t_step, dimfeature)    outputshape(t_step, outfeature)
@@ -161,29 +162,29 @@ class RNNLayer2:
                                       strict=True)
         
     def reinitialParameters(self):
-        self.U = theano.shared(
+        self.U.set_value(theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.input_dim)),
-             name = 'U')
-        self.W = theano.shared(
+             name = 'U'))
+        self.W.set_value(theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1, self.hidden_dim1)),
-             name = 'W')
-        self.B = theano.shared(
+             name = 'W'))
+        self.B.set_value(theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim1)),
-             name = 'B')
+             name = 'B'))
         
-        self.U2 = theano.shared(
+        self.U2.set_value(theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim2, self.hidden_dim1)),
-             name = 'U2')
-        self.B2 = theano.shared(
+             name = 'U2'))
+        self.B2.set_value(theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim2)),
-             name = 'B2')
+             name = 'B2'))
 
-        self.V = theano.shared(
+        self.V.set_value(theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim, self.hidden_dim2)),
-             name = 'V')
-        self.BO = theano.shared(
+             name = 'V'))
+        self.BO.set_value(theano.shared(
             np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim)),
-             name = 'BO')
+             name = 'BO'))
 
 
     def binary_crossentropy(self, output, y):
