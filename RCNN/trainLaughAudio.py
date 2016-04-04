@@ -12,6 +12,15 @@ from ReadData import *
 from RNNLayer import *
 from util import *
 
+#===============================================================================
+# npzfile = np.load('../result/4nodes/rnn_cross/1/parameter2.data.npz')
+# U, V, W, B, BO = npzfile["U"], npzfile["V"], npzfile["W"], npzfile["B"], npzfile["BO"]
+# print(U)
+# 
+# npzfile = np.load('../result/4nodes/rnn_cross/2/parameter2.data.npz')
+# U, V, W, B, BO = npzfile["U"], npzfile["V"], npzfile["W"], npzfile["B"], npzfile["BO"]
+# print(U)
+#===============================================================================
 
 timestart = datetime.now()
 #npx, npy= buildData(datapath = 'final/', type='laugh')
