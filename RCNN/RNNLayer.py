@@ -44,23 +44,6 @@ class RNNLayer:
             np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim)),
              name = 'BO')
 
-#         self.U = theano.shared(
-#             np.random.uniform(-np.sqrt(1./self.input_dim), np.sqrt(1./self.input_dim), (self.hidden_dim, self.input_dim)),
-#              name = 'U')
-#         self.W = theano.shared(
-#             np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.hidden_dim, self.hidden_dim)),
-#              name = 'W')
-#         self.B = theano.shared(
-#             np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.hidden_dim)),
-#              name = 'B')
-#         
-# 
-#         self.V = theano.shared(
-#             np.random.uniform(-np.sqrt(1./self.output_dim), np.sqrt(1./self.output_dim), (self.output_dim, self.hidden_dim)),
-#              name = 'V')
-#         self.BO = theano.shared(
-#             np.random.uniform(-np.sqrt(1./self.hidden_dim), np.sqrt(1./self.hidden_dim), (self.output_dim)),
-#              name = 'BO')
 
         # store parameters of this layer
         self.params = [self.U, self.V, self.W, self.B,self.BO]
@@ -95,6 +78,80 @@ class RNNLayer:
     def reinitialParameters(self):
         self.U.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim, self.input_dim)))
         self.W.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim, self.hidden_dim)))
+        self.B.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim)))
+
+        self.V.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim, self.hidden_dim)))
+        self.BO.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim)))
+        
+        
+        
+        
+class NNLayer:
+    #inputshape (t_step, dimfeature)    outputshape(t_step, outfeature)
+    def __init__(self, input, inputdim, hiddendim, outputdim):
+
+        def forward_recurrent_step(x_t, U, V, B, BO):
+            a = T.dot(U, x_t)
+            #b = T.dot(W, s_t_p)
+            s_t = T.tanh(a + B)
+            o_t = T.clip(T.nnet.softmax(T.dot(V, s_t) + BO), 0.0000001,0.9999999)
+            return [o_t[0], s_t]
+
+        self.input = input
+        self.input_dim = inputdim # + 1
+        self.output_dim = outputdim
+        self.hidden_dim = hiddendim
+        
+        self.U = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim, self.input_dim)),
+             name = 'U')
+        #self.W = theano.shared(
+         #   np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim, self.hidden_dim)),
+          #   name = 'W')
+        self.B = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.hidden_dim)),
+             name = 'B')
+        
+
+        self.V = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim, self.hidden_dim)),
+             name = 'V')
+        self.BO = theano.shared(
+            np.random.uniform(-np.sqrt(1), np.sqrt(1), (self.output_dim)),
+             name = 'BO')
+
+
+        # store parameters of this layer
+        self.params = [self.U, self.V, self.B,self.BO]
+        [self.output, st], updates = theano.scan(forward_recurrent_step,
+                                      sequences=input,
+                                      outputs_info=[None, None],
+                                      non_sequences=[self.U, self.V, self.B, self.BO])
+
+    def binary_crossentropy(self, output, y):
+        return T.mean(T.nnet.binary_crossentropy(output, y))
+    
+    def categorical_crossentropy(self, output, y):
+        return T.mean(T.nnet.categorical_crossentropy(output, y))
+    
+    def save_model_parameters_theano(self, outfile):
+        U, V, B, BO = self.U.get_value(), self.V.get_value(), self.B.get_value(), self.BO.get_value()
+        np.savez(outfile, U=U, V=V, B=B, BO=BO)
+        print ("Saved model parameters to %s." % outfile)
+   
+    def load_model_parameters_theano(self, path):
+        npzfile = np.load(path)
+        U, V, B, BO = npzfile["U"], npzfile["V"], npzfile["B"], npzfile["BO"]
+        #self.hidden_dim = U.shape[0]
+        self.U.set_value(U)
+        self.V.set_value(V)
+        self.B.set_value(B)
+        self.BO.set_value(BO)
+        print ("load model parameters to %s." % path)
+
+    def reinitialParameters(self):
+        self.U.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim, self.input_dim)))
+        #self.W.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim, self.hidden_dim)))
         self.B.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.hidden_dim)))
 
         self.V.set_value(np.random.uniform(-np.sqrt(1.), np.sqrt(1.), (self.output_dim, self.hidden_dim)))
@@ -209,7 +266,8 @@ class RNN:
         self.learning_rate = T.scalar('learning_rate')
 
         #self.layer = RNNLayer2(x, inputdim, hiddendim[0], hiddendim[1], outputdim)
-        self.layer = RNNLayer(x, inputdim, hiddendim, outputdim)
+        #self.layer = RNNLayer(x, inputdim, hiddendim, outputdim)
+        self.layer = NNLayer(x, inputdim, hiddendim, outputdim)
 
         o_error = self.layer.categorical_crossentropy(self.layer.output, y)
 
