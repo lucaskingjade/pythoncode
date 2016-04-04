@@ -107,17 +107,30 @@ def calculateEverageAccuracy(model, X_train, Y_train, idx):
         acc.append(calculateAccuracy(model, x, y))
     acctrain = np.mean(acc[0:trainDatalen])
     acctest = np.mean(acc[trainDatalen:testlen])
-    writeFile('crossvalidation.log', "%d %f %f" %  (idx, acctrain, acctest))
+    writeFile('crossvalidation.log', "%d %f %f\n" %  (idx, acctrain, acctest))
     
 def train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput):
+    tlen = len(orgnizeddatainput)
+    arr = np.arange(tlen)
+    #ramdom init
+    inp = []
+    outp = []
+    for i in arr:
+        inp.append(orgnizeddatainput[i])
+        outp.append(orgnizeddataoutput[i])
+        
+    inputdata = np.asarray(inp)
+    outputdata = np.asarray(outp)
+    
     shift = 5
     for i in range(10):
         model.reinitialParameters()
-        inputX = np.roll(orgnizeddatainput, shift)
-        intputY = np.roll(orgnizeddataoutput, shift)
-        train_with_sgd_cross(model, inputX, intputY, 0.01, 20)
+        inputX = np.roll(inputdata, shift)
+        inputY = np.roll(outputdata, shift)
+        ##train_with_sgd_cross(model, inputX, intputY, 0.01, 20)
+        calculateEverageAccuracy(model, inputX, inputY, i)
         model.saveParametersInFile('parameter%d.data'%(i))
-        calculateEverageAccuracy(model, inputX, intputY, i)
+        
     
 #train_with_sgd_cross(model, orgnizeddatainput, orgnizeddataoutput)
 train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput)
