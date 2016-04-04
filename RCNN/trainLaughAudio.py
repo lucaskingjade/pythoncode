@@ -127,7 +127,7 @@ def train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput):
         model.reinitialParameters()
         inputX = np.roll(inputdata, shift)
         inputY = np.roll(outputdata, shift)
-        ##train_with_sgd_cross(model, inputX, intputY, 0.01, 20)
+        train_with_sgd_cross(model, inputX, inputY, 0.01, 20)
         calculateEverageAccuracy(model, inputX, inputY, i)
         model.saveParametersInFile('parameter%d.data'%(i))
         
