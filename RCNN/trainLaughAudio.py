@@ -94,7 +94,7 @@ def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, n
     timeend = datetime.now()
     print("total train: %f second" %  (timeend - timebegin).total_seconds())
     if(writelog):
-        writeFile('speedlog.log', "total train: %f second" %  (timeend - timebegin).total_seconds())
+        writeFile('speedlog.log', "total train: %f second \n" %  (timeend - timebegin).total_seconds())
         
     print('training finish')
     
