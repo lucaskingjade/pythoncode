@@ -122,7 +122,7 @@ def train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput):
     inputdata = np.asarray(inp)
     outputdata = np.asarray(outp)
     
-    shift = 5
+    shift = 20
     for i in range(10):
         model.reinitialParameters()
         inputX = np.roll(inputdata, shift)
