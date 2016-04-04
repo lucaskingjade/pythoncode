@@ -111,7 +111,7 @@ def calculateEverageAccuracy(model, X_train, Y_train, idx):
     
 def train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput):
     tlen = len(orgnizeddatainput)
-    arr = np.arange(tlen)
+    arr = np.random.permutation(tlen)
     #ramdom init
     inp = []
     outp = []
