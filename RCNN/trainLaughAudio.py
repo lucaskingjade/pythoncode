@@ -17,7 +17,9 @@ timestart = datetime.now()
 #npx, npy= buildData(datapath = 'final/', type='laugh')
 npx, npy= buildData(datapath = 'final/', type='geste')
 
-orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, 20, 4)
+frames = 10
+features = 4
+orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, frames, features)
 
 #originalLabel = np.argmax(orgnizeddataoutput, axis = 1)
 print("data size: %d " %  (len(orgnizeddatainput)))
@@ -26,7 +28,7 @@ timeend = datetime.now()
 print("data loading: %f second" %  (timeend - timestart).total_seconds())
 
 #model = RNN(80, [50,10], 4)
-model = RNN(80, 50, 4)
+model = RNN(frames * features, 50, 4)
 model.reinitialParameters()
 
 #acc = calculateAccuracy(model, orgnizeddatainput[0], orgnizeddataoutput[0])
