@@ -40,7 +40,7 @@ def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, n
     timebegin = datetime.now()
     losses = []
     num_examples_seen = 0
-    trainDatalen = int(len(Y_train) * 0.6)
+    trainDatalen = int(len(Y_train) * 0.9)
     testlen = int(len(Y_train))
     
     if(writelog):
@@ -103,7 +103,7 @@ def train_with_sgd_cross(model, X_train, Y_train, learning_rate=LEARNING_RATE, n
     
     
 def calculateEverageAccuracy(model, X_train, Y_train, idx):
-    trainDatalen = int(len(Y_train) * 0.6)
+    trainDatalen = int(len(Y_train) * 0.9)
     testlen = int(len(Y_train))
     acc = []
     for x, y in zip(X_train, Y_train):
