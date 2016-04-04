@@ -17,7 +17,7 @@ timestart = datetime.now()
 #npx, npy= buildData(datapath = 'final/', type='laugh')
 npx, npy= buildData(datapath = 'final/', type='geste')
 
-frames = 5
+frames = 1
 features = 4
 orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, frames, features)
 
@@ -28,7 +28,7 @@ timeend = datetime.now()
 print("data loading: %f second" %  (timeend - timestart).total_seconds())
 
 #model = RNN(80, [50,10], 4)
-model = RNN(frames * features, 50, 4)
+model = RNN(frames * features, 4, 4)
 model.reinitialParameters()
 
 #acc = calculateAccuracy(model, orgnizeddatainput[0], orgnizeddataoutput[0])
@@ -125,7 +125,7 @@ def train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput):
     inputdata = np.asarray(inp)
     outputdata = np.asarray(outp)
     
-    shift = 20
+    shift = int(tlen / 10)
     for i in range(10):
         model.reinitialParameters()
         inputX = np.roll(inputdata, shift)

@@ -266,8 +266,9 @@ class RNN:
         self.learning_rate = T.scalar('learning_rate')
 
         #self.layer = RNNLayer2(x, inputdim, hiddendim[0], hiddendim[1], outputdim)
-        #self.layer = RNNLayer(x, inputdim, hiddendim, outputdim)
-        self.layer = NNLayer(x, inputdim, hiddendim, outputdim)
+        self.layer = RNNLayer(x, inputdim, hiddendim, outputdim)
+        #
+        #self.layer = NNLayer(x, inputdim, hiddendim, outputdim)
 
         o_error = self.layer.categorical_crossentropy(self.layer.output, y)
 
