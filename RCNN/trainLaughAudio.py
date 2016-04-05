@@ -23,8 +23,8 @@ from util import *
 #===============================================================================
 
 timestart = datetime.now()
-#npx, npy= buildData(datapath = 'final/', type='laugh')
-npx, npy= buildData(datapath = 'final/', type='geste')
+npx, npy= buildData(datapath = 'final/', type='laugh')
+#npx, npy= buildData(datapath = 'final/', type='geste')
 
 frames = 1
 features = 4
