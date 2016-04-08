@@ -194,6 +194,7 @@ def getXY(data):
     return x, y
 
 def buildData(datapath = 'C:/Users/Jing/Videos/final/', type='laugh'):
+    print(type)
     files = ['AA002501_brianFinal','AA002601_brianFinal','AA002602_brianFinal','AA000201_BriceFinal','AA000201_carolineFinal','AA000202_BriceFinal','AA000202_carolineFinal','AA000301_kenFinal','AA000302_kenFinal','AA000303_kenFinal']
     path = datapath
     datasetX = []

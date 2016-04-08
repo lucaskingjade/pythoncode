@@ -12,6 +12,19 @@ from ReadData import *
 from RNNLayer import *
 from util import *
 
+
+# logv = T.matrix()
+# newlog = T.set_subtensor(logv[:,0], logv[:,0] * 10.0)
+# 
+# f = theano.function([logv], newlog)
+# 
+# a = np.array([[1.0,3.0], [2.0,4.0]])
+# 
+# b = f(a)
+# 
+# print(b)
+# print(a)
+
 #===============================================================================
 # npzfile = np.load('../result/4nodes/rnn_cross/1/parameter2.data.npz')
 # U, V, W, B, BO = npzfile["U"], npzfile["V"], npzfile["W"], npzfile["B"], npzfile["BO"]
@@ -26,7 +39,7 @@ timestart = datetime.now()
 npx, npy= buildData(datapath = 'final/', type='laugh')
 #npx, npy= buildData(datapath = 'final/', type='geste')
 
-frames = 1
+frames = 10
 features = 4
 orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, frames, features)
 
@@ -37,8 +50,9 @@ timeend = datetime.now()
 print("data loading: %f second" %  (timeend - timestart).total_seconds())
 
 #model = RNN(80, [50,10], 4)
-model = RNN(frames * features, 4, 4)
+model = RNN(frames * features, [100, 50, 20], 4)
 model.reinitialParameters()
+#model.loadFile('parameter0.data.npz')
 
 #acc = calculateAccuracy(model, orgnizeddatainput[0], orgnizeddataoutput[0])
 #p = model.predict(orgnizeddatainput[0])
@@ -124,6 +138,7 @@ def calculateEverageAccuracy(model, X_train, Y_train, idx):
 def train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput):
     tlen = len(orgnizeddatainput)
     arr = np.random.permutation(tlen)
+    arr = np.arange(tlen)
     #ramdom init
     inp = []
     outp = []
@@ -135,14 +150,28 @@ def train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput):
     outputdata = np.asarray(outp)
     
     shift = int(tlen / 10)
-    for i in range(10):
+    for i in range(1):
         model.reinitialParameters()
         inputX = np.roll(inputdata, shift)
         inputY = np.roll(outputdata, shift)
-        train_with_sgd_cross(model, inputX, inputY, 0.01, 20)
+        train_with_sgd_cross(model, inputX, inputY, 0.01, 200)
         calculateEverageAccuracy(model, inputX, inputY, i)
         model.saveParametersInFile('parameter%d.data'%(i))
         
-    
+        
+#calculateEverageAccuracy(model, orgnizeddatainput, orgnizeddataoutput, 1)
+# example = 1
+# ypredict = model.predict(npx[example])
+# output = np.asarray(npy[example])
+# yreal = np.argmax(output, axis = 1)
+# for i in ypredict:
+#     print('%d'%i, end=" ")
+# print('\n')
+# for i in yreal:
+#     print('%d'%i, end=" ")
+#     
+# 
+# print(ypredict)
+# print(yreal)
 #train_with_sgd_cross(model, orgnizeddatainput, orgnizeddataoutput)
 train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput)
