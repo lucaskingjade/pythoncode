@@ -340,11 +340,11 @@ class RNNLayer3:
         return T.mean(T.nnet.binary_crossentropy(output, y))
     
     def categorical_crossentropy(self, output, y):
-        #return T.mean(T.nnet.categorical_crossentropy(output, y))
-        logv = y * T.log(output)
-        newlogv = T.set_subtensor(logv[:,0], logv[:,0] / 10.0)
-        a = -T.sum(newlogv, axis=output.ndim - 1)
-        return  T.mean(a)
+        return T.mean(T.nnet.categorical_crossentropy(output, y))
+#         logv = y * T.log(output)
+#         newlogv = T.set_subtensor(logv[:,0], logv[:,0] / 3.0)
+#         a = -T.sum(newlogv, axis=output.ndim - 1)
+#         return  T.mean(a)
     
     def save_model_parameters_theano(self, outfile):
         U, V, W, B, BO,U2,B2, U3, B3 = self.U.get_value(), self.V.get_value(), self.W.get_value(), self.B.get_value(), self.BO.get_value(), self.U2.get_value(),self.B2.get_value(), self.U3.get_value(),self.B3.get_value()

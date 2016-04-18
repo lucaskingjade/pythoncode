@@ -189,9 +189,12 @@ def getData(type, data):
         return object
     
 def getXY(data):
-    x = [[data[i][j] for j in [1,2,3,4]] for i in range(len(data))]
+    a = [0.002, 1000, 0.01, 0.02]
+    x = [[data[i][j] * a[j-1] for j in [1,2,3,4]] for i in range(len(data))]
     y = [[data[i][j] for j in [5,6,7,8]] for i in range(len(data))]
-    return x, y
+    y2 = [[data[i][j], 1 - data[i][j]] for j in [5] for i in range(len(data))]
+    
+    return x, y, y2
 
 def buildData(datapath = 'C:/Users/Jing/Videos/final/', type='laugh'):
     print(type)
@@ -199,16 +202,19 @@ def buildData(datapath = 'C:/Users/Jing/Videos/final/', type='laugh'):
     path = datapath
     datasetX = []
     datasetY = []
+    datasetY2 = []
     for file in files:
         head, data = readFinalData(path+file+'.txt')
         d = getData(type, data)
         #d = getData('geste', data)
-        x, y = getXY(d)
+        x, y, y2 = getXY(d)
         datasetX.append(x)
         datasetY.append(y)
+        datasetY2.append(y2)
     npX = np.asarray(datasetX) 
     npY = np.asarray(datasetY) 
-    return npX, npY
+    npY2 = np.asarray(datasetY2) 
+    return npX, npY, npY2
         
         
 #buildData()   

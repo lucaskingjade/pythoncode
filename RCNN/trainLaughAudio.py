@@ -36,12 +36,13 @@ from util import *
 #===============================================================================
 
 timestart = datetime.now()
-npx, npy= buildData(datapath = 'final/', type='laugh')
-#npx, npy= buildData(datapath = 'final/', type='geste')
+npx, npy, npy2= buildData(datapath = 'final/', type='laugh')
+#npx, npy, npY2= buildData(datapath = 'final/', type='geste')
 
-frames = 10
+frames = 200
 features = 4
-orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, frames, features)
+#orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, frames, features)
+orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy2, frames, features)
 
 #originalLabel = np.argmax(orgnizeddataoutput, axis = 1)
 print("data size: %d " %  (len(orgnizeddatainput)))
@@ -50,7 +51,8 @@ timeend = datetime.now()
 print("data loading: %f second" %  (timeend - timestart).total_seconds())
 
 #model = RNN(80, [50,10], 4)
-model = RNN(frames * features, [100, 50, 20], 4)
+#model = RNN(frames * features, [100, 50, 20], 4)
+model = RNN(frames * features, [100, 50, 20], 2)
 model.reinitialParameters()
 #model.loadFile('parameter0.data.npz')
 
@@ -154,7 +156,7 @@ def train_with_CrossValidation(model, orgnizeddatainput, orgnizeddataoutput):
         model.reinitialParameters()
         inputX = np.roll(inputdata, shift)
         inputY = np.roll(outputdata, shift)
-        train_with_sgd_cross(model, inputX, inputY, 0.01, 200)
+        train_with_sgd_cross(model, inputX, inputY, 0.01, 1000)
         calculateEverageAccuracy(model, inputX, inputY, i)
         model.saveParametersInFile('parameter%d.data'%(i))
         
