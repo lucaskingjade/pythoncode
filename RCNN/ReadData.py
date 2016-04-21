@@ -66,20 +66,21 @@ def readPhaseLabels(filename):
 
 
 def translateData(file1, file2, file3):
-    head = ['time', 'pitch', 'RMS', 'intensity', 'loudness', 'noLaugh', 'smallLaugh', 'bigLaugh', 'laughingAndSpeaking', 'noGeste', 'prep', 'stroke', 'retract']
+    #head = ['time', 'pitch', 'RMS', 'intensity', 'loudness', 'noLaugh', 'smallLaugh', 'bigLaugh', 'laughingAndSpeaking', 'noGeste', 'prep', 'stroke', 'retract']
+    head = ['time', 'pitch', 'RMS', 'intensity', 'loudness', 'no', 'speaking', 'laughingAndSpeaking', 'smallLaugh', 'bigLaugh']
     #data = readAcoustics("2601/AA002601_brian.txt")
     #head2, dataAudio = readAudioLabels("2601/AA002601_audio.txt")
     #head3, dataPhase = readPhaseLabels("2601/AA002601_phase.txt")
     data = readAcoustics(file1+'.txt')
     head2, dataAudio = readAudioLabels(file2+'.txt')
-    head3, dataPhase = readPhaseLabels(file3+'.txt')
+    #head3, dataPhase = readPhaseLabels(file3+'.txt')
     finalData = []
     finalData.append(head)
     
     startAudio = float(dataAudio[0][0])
     endAudio = float(dataAudio[0][1])
-    startPhase = float(dataPhase[0][0])
-    endPhase = float(dataPhase[0][1])
+    #startPhase = float(dataPhase[0][0])
+    #endPhase = float(dataPhase[0][1])
     
     
     for linedata in data:
@@ -94,17 +95,26 @@ def translateData(file1, file2, file3):
             else:
                 startAudio = -1
         
-        if(currentTime > endPhase and startPhase >= 0):
-            del dataPhase[0]
-            if(len(dataPhase) != 0):
-                startPhase = float(dataPhase[0][0])
-                endPhase = float(dataPhase[0][1])
-            else:
-                startPhase = -1
+#         if(currentTime > endPhase and startPhase >= 0):
+#             del dataPhase[0]
+#             if(len(dataPhase) != 0):
+#                 startPhase = float(dataPhase[0][0])
+#                 endPhase = float(dataPhase[0][1])
+#             else:
+#                 startPhase = -1
             
         if(currentTime >= startAudio and currentTime <= endAudio and startAudio >= 0):
             label = dataAudio[0][2]
-            if label == 'noLaugh':
+            if label == 'no':
+                linedata.extend('1')
+            else:
+                linedata.extend('0')
+            if label == 'speaking':
+                linedata.extend('1')
+            else:
+                linedata.extend('0')
+            
+            if label == 'laughingAndSpeaking':
                 linedata.extend('1')
             else:
                 linedata.extend('0')
@@ -119,44 +129,42 @@ def translateData(file1, file2, file3):
             else:
                 linedata.extend('0')
                 
-            if label == 'laughingAndSpeaking':
-                linedata.extend('1')
-            else:
-                linedata.extend('0')
+            
         else:
             linedata.extend('1')
+            linedata.extend('0')
             linedata.extend('0')
             linedata.extend('0')
             linedata.extend('0')
                 
                 
             
-        if(currentTime >= startPhase and currentTime <= endPhase and startPhase >= 0):
-            label = dataPhase[0][2]
-            if label == 'noGeste':
-                linedata.extend('1')
-            else:
-                linedata.extend('0')
-                
-            if label == 'prep':
-                linedata.extend('1')
-            else:
-                linedata.extend('0')
-                
-            if label == 'stroke':
-                linedata.extend('1')
-            else:
-                linedata.extend('0')
-                
-            if label == 'retract':
-                linedata.extend('1')
-            else:
-                linedata.extend('0')
-        else:
-            linedata.extend('1')
-            linedata.extend('0')
-            linedata.extend('0')
-            linedata.extend('0')
+#         if(currentTime >= startPhase and currentTime <= endPhase and startPhase >= 0):
+#             label = dataPhase[0][2]
+#             if label == 'noGeste':
+#                 linedata.extend('1')
+#             else:
+#                 linedata.extend('0')
+#                 
+#             if label == 'prep':
+#                 linedata.extend('1')
+#             else:
+#                 linedata.extend('0')
+#                 
+#             if label == 'stroke':
+#                 linedata.extend('1')
+#             else:
+#                 linedata.extend('0')
+#                 
+#             if label == 'retract':
+#                 linedata.extend('1')
+#             else:
+#                 linedata.extend('0')
+#         else:
+#             linedata.extend('1')
+#             linedata.extend('0')
+#             linedata.extend('0')
+#             linedata.extend('0')
         
         finalData.append(linedata)
         print(linedata)
@@ -173,14 +181,15 @@ def readFinalData(filename):
         if not in_line:
             break
         in_line = in_line[:-1]
-        object = [time, pitch, RMS, intensity, loudness, noLaugh, smallLaugh, bigLaugh, laughingAndSpeaking, noGeste, prep, stroke, retract] = in_line.split(" ")
+        #object = [time, pitch, RMS, intensity, loudness, noLaugh, smallLaugh, bigLaugh, laughingAndSpeaking, noGeste, prep, stroke, retract] = in_line.split(" ")
+        object = [time, pitch, RMS, intensity, loudness, no, spearking, laughingAndSpeaking,  smallLaugh, bigLaugh] = in_line.split(" ")
         data.append(object);
     in_file.close()
     return head, data
 
 def getData(type, data):
     if(type == 'laugh'):
-        object = [[float(data[i][j]) for j in range(9)] for i in range(len(data))]
+        object = [[float(data[i][j]) for j in range(10)] for i in range(len(data))]
         #print(objet[2164])
         return object
     elif (type == 'geste'):
@@ -191,14 +200,24 @@ def getData(type, data):
 def getXY(data):
     a = [0.002, 1000, 0.01, 0.02]
     x = [[data[i][j] * a[j-1] for j in [1,2,3,4]] for i in range(len(data))]
-    y = [[data[i][j] for j in [5,6,7,8]] for i in range(len(data))]
+    #y = [[data[i][j] for j in [5,6,7,8,9]] for i in range(len(data))]
+    y = []
+    for i in range(len(data)):
+        if (data[i][5] == 1):
+            y.append([1,0,0])
+        elif (data[i][6] == 1):
+            y.append([0,1,0])
+        else:
+            y.append([0,0,1])  
     y2 = [[data[i][j], 1 - data[i][j]] for j in [5] for i in range(len(data))]
     
     return x, y, y2
 
-def buildData(datapath = 'C:/Users/Jing/Videos/final/', type='laugh'):
+def buildData(datapath = 'C:/Users/Jing/Videos/LaughterAnnotation/new/', type='laugh'):
     print(type)
-    files = ['AA002501_brianFinal','AA002601_brianFinal','AA002602_brianFinal','AA000201_BriceFinal','AA000201_carolineFinal','AA000202_BriceFinal','AA000202_carolineFinal','AA000301_kenFinal','AA000302_kenFinal','AA000303_kenFinal']
+    #files = ['AA002501_brianFinal','AA002601_brianFinal','AA002602_brianFinal','AA000201_BriceFinal','AA000201_carolineFinal','AA000202_BriceFinal','AA000202_carolineFinal','AA000301_kenFinal','AA000302_kenFinal','AA000303_kenFinal']
+    files = ['AA002501_brianFinal','AA002601_brianFinal','AA002602_brianFinal','AA000201_BriceFinal','AA000201_carolineFinal','AA000202_BriceFinal','AA000202_carolineFinal','AA000301_kenFinal']
+    
     path = datapath
     datasetX = []
     datasetY = []
@@ -218,18 +237,18 @@ def buildData(datapath = 'C:/Users/Jing/Videos/final/', type='laugh'):
         
         
 #buildData()   
-#translateData('C:/Users/Jing/Videos/all/AA000201_Brice','C:/Users/Jing/Videos/LaughterAnnotation/AA000201(1)_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000201(1)_phase') 
-#translateData('C:/Users/Jing/Videos/all/AA000201_caroline','C:/Users/Jing/Videos/LaughterAnnotation/AA000201_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000201_phase') 
-#translateData('C:/Users/Jing/Videos/all/AA000202_Brice','C:/Users/Jing/Videos/LaughterAnnotation/AA000202(1)_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000202(1)_phase') 
-#translateData('C:/Users/Jing/Videos/all/AA000202_caroline','C:/Users/Jing/Videos/LaughterAnnotation/AA000202_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000202_phase') 
-
-#translateData('C:/Users/Jing/Videos/all/AA000301_ken','C:/Users/Jing/Videos/LaughterAnnotation/AA000301_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000301_phase') 
-#translateData('C:/Users/Jing/Videos/all/AA000302_ken','C:/Users/Jing/Videos/LaughterAnnotation/AA000302_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000302_phase') 
-#translateData('C:/Users/Jing/Videos/all/AA000303_ken','C:/Users/Jing/Videos/LaughterAnnotation/AA000303_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000303_phase') 
-
-#translateData('C:/Users/Jing/Videos/all/AA002501_brian','C:/Users/Jing/Videos/LaughterAnnotation/AA002501_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002501_phase') 
-#translateData('C:/Users/Jing/Videos/all/AA002601_brian','C:/Users/Jing/Videos/LaughterAnnotation/AA002601_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002601_phase') 
-#translateData('C:/Users/Jing/Videos/all/AA002602_brian','C:/Users/Jing/Videos/LaughterAnnotation/AA002602_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002602_phase') 
+# translateData('C:/Users/Jing/Videos/all/AA000201_Brice','C:/Users/Jing/Videos/LaughterAnnotation/new/AA000201(1)_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000201(1)_phase') 
+# translateData('C:/Users/Jing/Videos/all/AA000201_caroline','C:/Users/Jing/Videos/LaughterAnnotation/new/AA000201_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000201_phase') 
+# translateData('C:/Users/Jing/Videos/all/AA000202_Brice','C:/Users/Jing/Videos/LaughterAnnotation/new/AA000202(1)_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000202(1)_phase') 
+# translateData('C:/Users/Jing/Videos/all/AA000202_caroline','C:/Users/Jing/Videos/LaughterAnnotation/new/AA000202_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000202_phase') 
+# 
+# translateData('C:/Users/Jing/Videos/all/AA000301_ken','C:/Users/Jing/Videos/LaughterAnnotation/new/AA000301_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000301_phase') 
+# #translateData('C:/Users/Jing/Videos/all/AA000302_ken','C:/Users/Jing/Videos/LaughterAnnotation/AA000302_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000302_phase') 
+# #translateData('C:/Users/Jing/Videos/all/AA000303_ken','C:/Users/Jing/Videos/LaughterAnnotation/AA000303_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA000303_phase') 
+# 
+# translateData('C:/Users/Jing/Videos/all/AA002501_brian','C:/Users/Jing/Videos/LaughterAnnotation/new/AA002501_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002501_phase') 
+# translateData('C:/Users/Jing/Videos/all/AA002601_brian','C:/Users/Jing/Videos/LaughterAnnotation/new/AA002601_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002601_phase') 
+# translateData('C:/Users/Jing/Videos/all/AA002602_brian','C:/Users/Jing/Videos/LaughterAnnotation/new/AA002602_audio', 'C:/Users/Jing/Videos/LaughterAnnotation/AA002602_phase') 
 
 #buildData()
 

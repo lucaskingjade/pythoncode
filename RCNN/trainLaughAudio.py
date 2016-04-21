@@ -41,8 +41,8 @@ npx, npy, npy2= buildData(datapath = 'final/', type='laugh')
 
 frames = 200
 features = 4
-#orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, frames, features)
-orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy2, frames, features)
+orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy, frames, features)
+#orgnizeddatainput, orgnizeddataoutput = prepareData(npx, npy2, frames, features)
 
 #originalLabel = np.argmax(orgnizeddataoutput, axis = 1)
 print("data size: %d " %  (len(orgnizeddatainput)))
@@ -52,7 +52,7 @@ print("data loading: %f second" %  (timeend - timestart).total_seconds())
 
 #model = RNN(80, [50,10], 4)
 #model = RNN(frames * features, [100, 50, 20], 4)
-model = RNN(frames * features, [100, 50, 20], 2)
+model = RNN(frames * features, [100, 50, 20], 3)
 model.reinitialParameters()
 #model.loadFile('parameter0.data.npz')
 
